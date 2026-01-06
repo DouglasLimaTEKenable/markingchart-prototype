@@ -101,7 +101,10 @@
             height: 100%;
             cursor: crosshair;
             touch-action: none;
-        }
+			touch-action: none;              /* Disables scrolling/zooming on the canvas */
+		    user-select: none;               /* Disables text selection */
+		    -webkit-tap-highlight-color: transparent; /* Removes blue highlight on tap */
+		}
 
         /* --- FORMS --- */
         .form-grid {
@@ -340,6 +343,7 @@
     let currentTool = 'black-pen';
     let isDrawing = false;
 
+    // --- CANVAS SETUP ---
     function resizeCanvas() {
         const w = horseImage.naturalWidth > 0 ? horseImage.clientWidth : 0;
         const h = horseImage.naturalHeight > 0 ? horseImage.clientHeight : 0;
@@ -350,7 +354,6 @@
         }
     }
 
-    // --- AUTOMATIC IMAGE LOADER ---
     function initImage() {
         const imgPath = 'Section1.png'; 
         const img = new Image();
@@ -358,35 +361,37 @@
         img.src = imgPath;
         
         img.onload = function() {
+            // Convert to Base64 for PDF safety
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = img.width;
             tempCanvas.height = img.height;
             const tempCtx = tempCanvas.getContext('2d');
             tempCtx.drawImage(img, 0, 0);
             
-            const dataURL = tempCanvas.toDataURL('image/png');
-            horseImage.src = dataURL; 
+            horseImage.src = tempCanvas.toDataURL('image/png'); 
             setTimeout(resizeCanvas, 50);
         };
-
-        img.onerror = function() {
-            // Silently fail or show placeholder if local file is missing in dev
-            console.log("Image load check");
-        };
+        img.onerror = () => console.log("Image load check failed or local file missing");
     }
 
     initImage();
     window.addEventListener('resize', resizeCanvas);
 
-    // --- UNIFIED INPUT HANDLER (MOUSE + TOUCH) ---
+    // --- ROBUST INPUT HANDLER (MOUSE + TOUCH) ---
     function getPos(e) {
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
         
-        // Check if it's a touch event or mouse event
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        // Robust check for Touch vs Mouse
+        let clientX, clientY;
+        if (e.changedTouches && e.changedTouches.length > 0) {
+            clientX = e.changedTouches[0].clientX;
+            clientY = e.changedTouches[0].clientY;
+        } else {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        }
 
         return {
             x: (clientX - rect.left) * scaleX,
@@ -400,12 +405,14 @@
         document.querySelector(`button[onclick="setTool('${tool}')"]`).classList.add('active-tool');
     }
 
-    // --- START DRAWING (MouseDown / TouchStart) ---
+    // --- DRAWING FUNCTIONS ---
     function startDraw(e) {
-        if (e.type === 'touchstart') e.preventDefault(); // Stop scrolling
+        // Stop browser from scrolling/zooming when touching canvas
+        if (e.cancelable) e.preventDefault();
         
         const pos = getPos(e);
-        
+
+        // Handle Stamps (M / X)
         if (currentTool === 'symbol-m' || currentTool === 'symbol-x') {
             ctx.font = 'bold 24px Arial';
             ctx.fillStyle = (currentTool === 'symbol-m') ? 'red' : 'black';
@@ -414,6 +421,7 @@
             return;
         }
         
+        // Handle Pens
         isDrawing = true;
         ctx.beginPath();
         ctx.moveTo(pos.x, pos.y);
@@ -422,38 +430,49 @@
         ctx.strokeStyle = (currentTool === 'red-pen') ? 'red' : 'black';
     }
 
-    // --- MOVE DRAWING (MouseMove / TouchMove) ---
     function moveDraw(e) {
         if (!isDrawing) return;
-        if (e.type === 'touchmove') e.preventDefault(); // Stop scrolling
+        if (e.cancelable) e.preventDefault(); // Stop scrolling while dragging
         
         const pos = getPos(e);
+        
+        // Draw the line segment
         ctx.lineTo(pos.x, pos.y);
         ctx.stroke();
+        
+        // MOBILE FIX: Reset path to current point.
+        // This prevents "long path" glitches on some mobile browsers.
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
     }
 
-    // --- END DRAWING (MouseUp / TouchEnd) ---
     function endDraw(e) {
-        isDrawing = false; 
-        ctx.closePath(); 
+        if (isDrawing) {
+            e.preventDefault();
+            isDrawing = false; 
+            ctx.closePath(); 
+        }
     }
 
-    // Event Listeners - MOUSE
+    // --- EVENT LISTENERS ---
+    // Mouse
     canvas.addEventListener('mousedown', startDraw);
     canvas.addEventListener('mousemove', moveDraw);
     canvas.addEventListener('mouseup', endDraw);
     canvas.addEventListener('mouseout', endDraw);
 
-    // Event Listeners - TOUCH (Mobile Fix)
-    canvas.addEventListener('touchstart', startDraw, { passive: false });
-    canvas.addEventListener('touchmove', moveDraw, { passive: false });
-    canvas.addEventListener('touchend', endDraw);
+    // Touch (Passive: false is CRITICAL for preventing scroll)
+    const touchOpt = { passive: false };
+    canvas.addEventListener('touchstart', startDraw, touchOpt);
+    canvas.addEventListener('touchmove', moveDraw, touchOpt);
+    canvas.addEventListener('touchend', endDraw, touchOpt);
+    canvas.addEventListener('touchcancel', endDraw, touchOpt);
 
     function clearCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
-    // --- PREVIEW RENDERER ---
+    // --- PREVIEW ---
     function renderPreview() {
         try {
             const container = document.getElementById('pdf-diagram-area');
@@ -461,74 +480,56 @@
 
             const wrapper = document.createElement('div');
             wrapper.className = 'pdf-diagram-wrapper';
-            
-            const imgClone = horseImage.cloneNode();
-            wrapper.appendChild(imgClone);
+            wrapper.appendChild(horseImage.cloneNode());
 
             const pCanvas = document.createElement('canvas');
             pCanvas.width = canvas.width;
             pCanvas.height = canvas.height;
-            const pCtx = pCanvas.getContext('2d');
-            pCtx.drawImage(canvas, 0, 0);
+            pCanvas.getContext('2d').drawImage(canvas, 0, 0);
             
             wrapper.appendChild(pCanvas);
             container.appendChild(wrapper);
 
-            const mapField = (src, dest) => {
-                const el = document.getElementById(src);
+            // Field Mapping
+            const map = (id, dest) => {
+                const el = document.getElementById(id);
                 if(el) document.getElementById(dest).innerText = el.value || '';
-            };
-            mapField('input-head', 'disp-head');
-            mapField('input-neck', 'disp-neck');
-            mapField('input-lf', 'disp-lf');
-            mapField('input-rf', 'disp-rf');
-            mapField('input-lh', 'disp-lh');
-            mapField('input-rh', 'disp-rh');
-            mapField('input-body', 'disp-body');
-            mapField('input-microchip', 'disp-microchip');
-            mapField('exam-date', 'disp-date');
+            }
+            map('input-head', 'disp-head');
+            map('input-neck', 'disp-neck');
+            map('input-lf', 'disp-lf');
+            map('input-rf', 'disp-rf');
+            map('input-lh', 'disp-lh');
+            map('input-rh', 'disp-rh');
+            map('input-body', 'disp-body');
+            map('input-microchip', 'disp-microchip');
+            map('exam-date', 'disp-date');
 
             const isApproved = document.getElementById('approve-chk').checked;
             document.getElementById('disp-status').innerText = isApproved ? 'APPROVED' : 'DRAFT';
             document.getElementById('watermark').style.display = isApproved ? 'none' : 'block';
             document.getElementById('disp-sig').innerText = isApproved ? "John Doe, DVM" : "";
-
-        } catch (error) {
-            console.error("Preview Error:", error);
-        }
+        } catch (e) { console.error(e); }
     }
 
     function generatePDF() {
-        if (typeof html2pdf === 'undefined') {
-            alert('PDF Library not loaded.');
-            return;
-        }
-
+        if (typeof html2pdf === 'undefined') return alert('PDF Lib missing');
         const element = document.getElementById('pdf-preview-container');
         const btn = document.getElementById('btn-download');
-        const originalText = btn.innerText;
+        const txt = btn.innerText;
+        
         btn.innerText = "Generating...";
         btn.disabled = true;
 
-        const opt = {
+        html2pdf().set({
             margin: 0,
             filename: 'MarkingChart.pdf',
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true }, 
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        html2pdf().set(opt).from(element).save()
-            .then(() => {
-                btn.innerText = originalText;
-                btn.disabled = false;
-            })
-            .catch(err => {
-                console.error(err);
-                alert("PDF Generation Failed: " + err.message);
-                btn.innerText = originalText;
-                btn.disabled = false;
-            });
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4' }
+        }).from(element).save()
+        .then(() => { btn.innerText = txt; btn.disabled = false; })
+        .catch(e => { alert(e.message); btn.innerText = txt; btn.disabled = false; });
     }
 </script>
 </body>
