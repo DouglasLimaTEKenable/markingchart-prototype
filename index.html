@@ -320,198 +320,216 @@
     </div>
 
     <script>
-        // --- LOGIC ---
-        function switchTab(tabId) {
-            if (tabId === 'preview') renderPreview();
+    // --- LOGIC ---
+    function switchTab(tabId) {
+        if (tabId === 'preview') renderPreview();
+        
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector(`button[onclick="switchTab('${tabId}')"]`).classList.add('active');
+        
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById(`tab-${tabId}`).classList.add('active');
+
+        if (tabId === 'markings') setTimeout(resizeCanvas, 50);
+    }
+
+    // --- DRAWING ENGINE ---
+    const canvas = document.getElementById('drawing-canvas');
+    const ctx = canvas.getContext('2d');
+    const horseImage = document.getElementById('horse-image');
+    let currentTool = 'black-pen';
+    let isDrawing = false;
+
+    function resizeCanvas() {
+        const w = horseImage.naturalWidth > 0 ? horseImage.clientWidth : 0;
+        const h = horseImage.naturalHeight > 0 ? horseImage.clientHeight : 0;
+        
+        if (w > 0 && h > 0 && (canvas.width !== w || canvas.height !== h)) {
+            canvas.width = w;
+            canvas.height = h;
+        }
+    }
+
+    // --- AUTOMATIC IMAGE LOADER ---
+    function initImage() {
+        const imgPath = 'Section1.png'; 
+        const img = new Image();
+        img.crossOrigin = 'Anonymous'; 
+        img.src = imgPath;
+        
+        img.onload = function() {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = img.width;
+            tempCanvas.height = img.height;
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.drawImage(img, 0, 0);
             
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelector(`button[onclick="switchTab('${tabId}')"]`).classList.add('active');
+            const dataURL = tempCanvas.toDataURL('image/png');
+            horseImage.src = dataURL; 
+            setTimeout(resizeCanvas, 50);
+        };
+
+        img.onerror = function() {
+            // Silently fail or show placeholder if local file is missing in dev
+            console.log("Image load check");
+        };
+    }
+
+    initImage();
+    window.addEventListener('resize', resizeCanvas);
+
+    // --- UNIFIED INPUT HANDLER (MOUSE + TOUCH) ---
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        
+        // Check if it's a touch event or mouse event
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        return {
+            x: (clientX - rect.left) * scaleX,
+            y: (clientY - rect.top) * scaleY
+        };
+    }
+
+    function setTool(tool) {
+        currentTool = tool;
+        document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active-tool'));
+        document.querySelector(`button[onclick="setTool('${tool}')"]`).classList.add('active-tool');
+    }
+
+    // --- START DRAWING (MouseDown / TouchStart) ---
+    function startDraw(e) {
+        if (e.type === 'touchstart') e.preventDefault(); // Stop scrolling
+        
+        const pos = getPos(e);
+        
+        if (currentTool === 'symbol-m' || currentTool === 'symbol-x') {
+            ctx.font = 'bold 24px Arial';
+            ctx.fillStyle = (currentTool === 'symbol-m') ? 'red' : 'black';
+            const text = (currentTool === 'symbol-m') ? 'M' : 'X';
+            ctx.fillText(text, pos.x - 8, pos.y + 8);
+            return;
+        }
+        
+        isDrawing = true;
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = (currentTool === 'red-pen') ? 'red' : 'black';
+    }
+
+    // --- MOVE DRAWING (MouseMove / TouchMove) ---
+    function moveDraw(e) {
+        if (!isDrawing) return;
+        if (e.type === 'touchmove') e.preventDefault(); // Stop scrolling
+        
+        const pos = getPos(e);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+    }
+
+    // --- END DRAWING (MouseUp / TouchEnd) ---
+    function endDraw(e) {
+        isDrawing = false; 
+        ctx.closePath(); 
+    }
+
+    // Event Listeners - MOUSE
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', moveDraw);
+    canvas.addEventListener('mouseup', endDraw);
+    canvas.addEventListener('mouseout', endDraw);
+
+    // Event Listeners - TOUCH (Mobile Fix)
+    canvas.addEventListener('touchstart', startDraw, { passive: false });
+    canvas.addEventListener('touchmove', moveDraw, { passive: false });
+    canvas.addEventListener('touchend', endDraw);
+
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // --- PREVIEW RENDERER ---
+    function renderPreview() {
+        try {
+            const container = document.getElementById('pdf-diagram-area');
+            container.innerHTML = '';
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'pdf-diagram-wrapper';
             
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.getElementById(`tab-${tabId}`).classList.add('active');
+            const imgClone = horseImage.cloneNode();
+            wrapper.appendChild(imgClone);
 
-            if (tabId === 'markings') setTimeout(resizeCanvas, 50);
-        }
-
-        // --- DRAWING ENGINE ---
-        const canvas = document.getElementById('drawing-canvas');
-        const ctx = canvas.getContext('2d');
-        const horseImage = document.getElementById('horse-image');
-        let currentTool = 'black-pen';
-        let isDrawing = false;
-
-        function resizeCanvas() {
-            // Only resize if image is actually loaded with dimensions
-            const w = horseImage.naturalWidth > 0 ? horseImage.clientWidth : 0;
-            const h = horseImage.naturalHeight > 0 ? horseImage.clientHeight : 0;
+            const pCanvas = document.createElement('canvas');
+            pCanvas.width = canvas.width;
+            pCanvas.height = canvas.height;
+            const pCtx = pCanvas.getContext('2d');
+            pCtx.drawImage(canvas, 0, 0);
             
-            if (w > 0 && h > 0 && (canvas.width !== w || canvas.height !== h)) {
-                canvas.width = w;
-                canvas.height = h;
-            }
-        }
+            wrapper.appendChild(pCanvas);
+            container.appendChild(wrapper);
 
-        // --- AUTOMATIC IMAGE LOADER (Repo Safe) ---
-        function initImage() {
-            const imgPath = 'Section1.png'; // Must match your repo file name
-            const img = new Image();
-            img.crossOrigin = 'Anonymous'; // Safe for same-origin (GitHub Pages)
-            img.src = imgPath;
-            
-            img.onload = function() {
-                // Convert to Base64 to ensure PDF lib has full access
-                const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = img.width;
-                tempCanvas.height = img.height;
-                const tempCtx = tempCanvas.getContext('2d');
-                tempCtx.drawImage(img, 0, 0);
-                
-                // Replace the DOM image source with the safe Base64 string
-                const dataURL = tempCanvas.toDataURL('image/png');
-                horseImage.src = dataURL; 
-                
-                // Wait for the new src to render, then resize
-                setTimeout(resizeCanvas, 50);
+            const mapField = (src, dest) => {
+                const el = document.getElementById(src);
+                if(el) document.getElementById(dest).innerText = el.value || '';
             };
+            mapField('input-head', 'disp-head');
+            mapField('input-neck', 'disp-neck');
+            mapField('input-lf', 'disp-lf');
+            mapField('input-rf', 'disp-rf');
+            mapField('input-lh', 'disp-lh');
+            mapField('input-rh', 'disp-rh');
+            mapField('input-body', 'disp-body');
+            mapField('input-microchip', 'disp-microchip');
+            mapField('exam-date', 'disp-date');
 
-            img.onerror = function() {
-                alert("Could not load Section1.png. Please ensure it is in the same folder.");
-            };
+            const isApproved = document.getElementById('approve-chk').checked;
+            document.getElementById('disp-status').innerText = isApproved ? 'APPROVED' : 'DRAFT';
+            document.getElementById('watermark').style.display = isApproved ? 'none' : 'block';
+            document.getElementById('disp-sig').innerText = isApproved ? "John Doe, DVM" : "";
+
+        } catch (error) {
+            console.error("Preview Error:", error);
+        }
+    }
+
+    function generatePDF() {
+        if (typeof html2pdf === 'undefined') {
+            alert('PDF Library not loaded.');
+            return;
         }
 
-        // Start initialization
-        initImage();
-        window.addEventListener('resize', resizeCanvas);
+        const element = document.getElementById('pdf-preview-container');
+        const btn = document.getElementById('btn-download');
+        const originalText = btn.innerText;
+        btn.innerText = "Generating...";
+        btn.disabled = true;
 
-        function getMousePos(e) {
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-            return {
-                x: (e.clientX - rect.left) * scaleX,
-                y: (e.clientY - rect.top) * scaleY
-            };
-        }
+        const opt = {
+            margin: 0,
+            filename: 'MarkingChart.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true }, 
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
 
-        function setTool(tool) {
-            currentTool = tool;
-            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active-tool'));
-            document.querySelector(`button[onclick="setTool('${tool}')"]`).classList.add('active-tool');
-        }
-
-        canvas.addEventListener('mousedown', (e) => {
-            const pos = getMousePos(e);
-            if (currentTool === 'symbol-m' || currentTool === 'symbol-x') {
-                ctx.font = 'bold 24px Arial';
-                ctx.fillStyle = (currentTool === 'symbol-m') ? 'red' : 'black';
-                const text = (currentTool === 'symbol-m') ? 'M' : 'X';
-                ctx.fillText(text, pos.x - 8, pos.y + 8);
-                return;
-            }
-            isDrawing = true;
-            ctx.beginPath();
-            ctx.moveTo(pos.x, pos.y);
-            ctx.lineWidth = 3;
-            ctx.lineCap = 'round';
-            ctx.strokeStyle = (currentTool === 'red-pen') ? 'red' : 'black';
-        });
-
-        canvas.addEventListener('mousemove', (e) => {
-            if (!isDrawing) return;
-            const pos = getMousePos(e);
-            ctx.lineTo(pos.x, pos.y);
-            ctx.stroke();
-        });
-
-        canvas.addEventListener('mouseup', () => { isDrawing = false; ctx.closePath(); });
-        canvas.addEventListener('mouseout', () => { isDrawing = false; ctx.closePath(); });
-
-        function clearCanvas() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-
-        // --- PREVIEW RENDERER ---
-        function renderPreview() {
-            try {
-                const container = document.getElementById('pdf-diagram-area');
-                container.innerHTML = '';
-
-                // Wrapper constrained by width
-                const wrapper = document.createElement('div');
-                wrapper.className = 'pdf-diagram-wrapper';
-                
-                // Clone Image (Uses Base64 source, safe for PDF)
-                const imgClone = horseImage.cloneNode();
-                wrapper.appendChild(imgClone);
-
-                // Create Visual Canvas
-                const pCanvas = document.createElement('canvas');
-                pCanvas.width = canvas.width;
-                pCanvas.height = canvas.height;
-                const pCtx = pCanvas.getContext('2d');
-                pCtx.drawImage(canvas, 0, 0);
-                
-                wrapper.appendChild(pCanvas);
-                container.appendChild(wrapper);
-
-                // Map Fields
-                const mapField = (src, dest) => {
-                    const el = document.getElementById(src);
-                    if(el) document.getElementById(dest).innerText = el.value || '';
-                };
-                mapField('input-head', 'disp-head');
-                mapField('input-neck', 'disp-neck');
-                mapField('input-lf', 'disp-lf');
-                mapField('input-rf', 'disp-rf');
-                mapField('input-lh', 'disp-lh');
-                mapField('input-rh', 'disp-rh');
-                mapField('input-body', 'disp-body');
-                mapField('input-microchip', 'disp-microchip');
-                mapField('exam-date', 'disp-date');
-
-                // Status
-                const isApproved = document.getElementById('approve-chk').checked;
-                document.getElementById('disp-status').innerText = isApproved ? 'APPROVED' : 'DRAFT';
-                document.getElementById('watermark').style.display = isApproved ? 'none' : 'block';
-                document.getElementById('disp-sig').innerText = isApproved ? "John Doe, DVM" : "";
-
-            } catch (error) {
-                console.error("Preview Error:", error);
-            }
-        }
-
-        function generatePDF() {
-            if (typeof html2pdf === 'undefined') {
-                alert('PDF Library not loaded.');
-                return;
-            }
-
-            const element = document.getElementById('pdf-preview-container');
-            const btn = document.getElementById('btn-download');
-            const originalText = btn.innerText;
-            btn.innerText = "Generating...";
-            btn.disabled = true;
-
-            const opt = {
-                margin: 0,
-                filename: 'MarkingChart.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true }, 
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            html2pdf().set(opt).from(element).save()
-                .then(() => {
-                    btn.innerText = originalText;
-                    btn.disabled = false;
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert("PDF Generation Failed: " + err.message);
-                    btn.innerText = originalText;
-                    btn.disabled = false;
-                });
-        }
-    </script>
+        html2pdf().set(opt).from(element).save()
+            .then(() => {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            })
+            .catch(err => {
+                console.error(err);
+                alert("PDF Generation Failed: " + err.message);
+                btn.innerText = originalText;
+                btn.disabled = false;
+            });
+    }
+</script>
 </body>
 </html>
