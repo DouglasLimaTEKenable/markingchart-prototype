@@ -2,119 +2,176 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HSI Veterinary Markings App (v2.1)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HSI Veterinary Markings</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <div class="tab-nav">
-        <button class="tab-btn active" onclick="switchTab('request')">Request Details</button>
-        <button class="tab-btn" onclick="switchTab('markings')">Markings Chart</button>
-        <button class="tab-btn" onclick="switchTab('preview')">PDF Preview</button>
-    </div>
+    <header class="app-header">
+        <h1>Vet Markings</h1>
+        <span class="badge">v2.1</span>
+    </header>
 
-    <div id="tab-request" class="tab-content active">
-        <h2>Request Details</h2>
-        <div class="form-grid">
-            <div class="form-group"><label>Marking Chart Status</label><input type="text" class="readonly-field" value="DRAFT" readonly></div>
-            <div class="form-group"><label>Marking Type</label><input type="text" class="readonly-field" value="Foal Breed Entry" readonly></div>
-            <div class="form-group"><label>Sire Name</label><input type="text" class="readonly-field" value="Galileo" readonly></div>
-            <div class="form-group"><label>Dam Name</label><input type="text" class="readonly-field" value="Ouija Board" readonly></div>
-            <div class="form-group"><label>Vet Name</label><input type="text" class="readonly-field" value="John Doe, DVM" readonly></div>
-            <div class="form-group"><label>Date of Examination</label><input type="date" id="exam-date"></div>
-        </div>
-    </div>
-
-    <div id="tab-markings" class="tab-content">
-        <h2>Markings Chart</h2>
+    <main class="app-content">
         
-        <div class="toolbar">
-            <button class="tool-btn" id="btn-select" onclick="setTool('select')" title="Click to Select, Drag to Move">
-                ✋ Select/Move
-            </button>
-            <div style="width:1px; height:30px; background:#ccc; margin:0 5px;"></div>
-            
-            <button class="tool-btn active-tool" onclick="setTool('black-pen')">Black Pen</button>
-            <button class="tool-btn" onclick="setTool('red-pen')">Red Pen</button>
-            <button class="tool-btn" onclick="setTool('symbol-m')"> 'M'</button>
-            <button class="tool-btn" onclick="setTool('symbol-x')"> 'X'</button>
+        <div id="tab-request" class="tab-content active">
+            <div class="card">
+                <h2 class="section-title">Horse Details</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Status</label>
+                        <input type="text" class="readonly-field" value="DRAFT" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        <input type="text" class="readonly-field" value="Foal Breed Entry" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Sire</label>
+                        <input type="text" class="readonly-field" value="Galileo" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Dam</label>
+                        <input type="text" class="readonly-field" value="Ouija Board" readonly>
+                    </div>
+                </div>
+            </div>
 
-            <div style="margin-left:auto; display:flex; gap:5px;">
-                <button class="tool-btn" onclick="undoLast()">Undo</button>
-                <button class="tool-btn delete-btn" id="btn-delete" onclick="deleteSelected()" disabled>Delete Selected</button>
-                <button class="tool-btn" style="background:#ffdddd;" onclick="clearAll()">Clear All</button>
+            <div class="card">
+                <h2 class="section-title">Vet Details</h2>
+                <div class="form-group">
+                    <label>Vet Name</label>
+                    <input type="text" class="readonly-field" value="John Doe, DVM" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Date of Examination</label>
+                    <input type="date" id="exam-date" style="padding: 12px;">
+                </div>
             </div>
         </div>
 
-        <div id="horse-diagram-container">
-            <img id="horse-image" src="" alt="Horse Outline">
-            <canvas id="drawing-canvas"></canvas>
-        </div>
-        <p style="font-size:0.85em; color:#666; margin-top:5px;">* To move or delete a mark, choose the <strong>✋ Select/Move</strong> tool, click the mark, then drag it or click 'Delete Selected'.</p>
+        <div id="tab-markings" class="tab-content">
+            
+            <div class="toolbar-sticky-wrapper">
+                <div class="toolbar">
+                    <div class="tool-group">
+                        <button class="tool-btn" id="btn-select" onclick="setTool('select')">
+                            <span>✋</span> <span class="btn-label">Move</span>
+                        </button>
+                    </div>
+                    
+                    <div class="tool-divider"></div>
 
-        <h3>Markings Description</h3>
-        <table id="examination-table" style="width:100%; border-collapse:collapse; margin-top:20px;">
-            <tr>
-                <td style="width:50%; vertical-align:top; padding-right:10px;">
+                    <div class="tool-group">
+                        <button class="tool-btn active-tool" onclick="setTool('black-pen')">
+                            <span class="dot-icon black"></span> <span class="btn-label">Pen</span>
+                        </button>
+                        <button class="tool-btn" onclick="setTool('red-pen')">
+                            <span class="dot-icon red"></span> <span class="btn-label">Red</span>
+                        </button>
+                        <button class="tool-btn" onclick="setTool('symbol-m')">M</button>
+                        <button class="tool-btn" onclick="setTool('symbol-x')">X</button>
+                    </div>
+
+                    <div class="tool-divider"></div>
+
+                    <div class="tool-group">
+                        <button class="tool-btn icon-only" onclick="undoLast()" title="Undo">↩</button>
+                        <button class="tool-btn delete-btn icon-only" id="btn-delete" onclick="deleteSelected()" disabled title="Delete">🗑</button>
+                        <button class="tool-btn danger-text" onclick="clearAll()">Clear</button>
+                    </div>
+                </div>
+                <p class="helper-text">Select ✋ to move/delete marks.</p>
+            </div>
+
+            <div id="horse-diagram-container">
+                <img id="horse-image" src="" alt="Horse Outline">
+                <canvas id="drawing-canvas"></canvas>
+            </div>
+
+            <div class="card mt-20">
+                <h3 class="section-title">Markings Description</h3>
+                <div class="input-stack">
                     <div class="form-group"><label>Head</label><textarea id="input-head" rows="2"></textarea></div>
                     <div class="form-group"><label>Neck</label><textarea id="input-neck" rows="2"></textarea></div>
                     <div class="form-group"><label>Foreleg L</label><textarea id="input-lf" rows="2"></textarea></div>
                     <div class="form-group"><label>Foreleg R</label><textarea id="input-rf" rows="2"></textarea></div>
-                </td>
-                <td style="width:50%; vertical-align:top; padding-left:10px;">
                     <div class="form-group"><label>Hindleg L</label><textarea id="input-lh" rows="2"></textarea></div>
                     <div class="form-group"><label>Hindleg R</label><textarea id="input-rh" rows="2"></textarea></div>
                     <div class="form-group"><label>Body</label><textarea id="input-body" rows="2"></textarea></div>
                     <div class="form-group"><label>Microchip No.</label><input type="text" id="input-microchip"></div>
-                </td>
-            </tr>
-        </table>
-        
-        <div style="margin-top:20px; padding:15px; background:#e9ecef; border-radius:5px;">
-            <label><input type="checkbox" id="approve-chk"> <strong>I hereby Approve this Markings Chart</strong></label>
-        </div>
-    </div>
-
-    <div id="tab-preview" class="tab-content">
-        <div class="toolbar">
-            <button class="tool-btn" onclick="generatePDF()" id="btn-download" style="background:#28a745; color:white; font-weight:bold;">Download PDF</button>
-        </div>
-
-        <div id="pdf-preview-container">
-            <div id="watermark">DRAFT</div>
-            <div class="pdf-section-header"><h3>VETERINARY MARKINGS CHART</h3></div>
-            
-            <div class="pdf-diagram-area" id="pdf-diagram-area">
                 </div>
-
-            <table class="pdf-table">
-                <tr>
-                    <th>HEAD</th>
-                    <td><span class="pdf-input-display" id="disp-head"></span></td>
-                    <th rowspan="8" style="vertical-align:top; background:#fff; width:40%;">
-                        <strong>DETAILS</strong><br><br>
-                        Microchip: <span class="pdf-input-display" id="disp-microchip"></span><br><br>
-                        Sire: Galileo<br>
-                        Dam: Ouija Board<br>
-                        Date: <span class="pdf-input-display" id="disp-date"></span><br><br>
-                        <div style="border:1px solid #333; padding:10px; margin-top:20px;">
-                            <strong>Vet Signature:</strong><br><br>
-                            <span style="font-family:'Brush Script MT', cursive; font-size:20px;" id="disp-sig"></span>
-                        </div>
-                    </th>
-                </tr>
-                <tr><th>NECK</th><td><span class="pdf-input-display" id="disp-neck"></span></td></tr>
-                <tr><th>FORELEG L</th><td><span class="pdf-input-display" id="disp-lf"></span></td></tr>
-                <tr><th>FORELEG R</th><td><span class="pdf-input-display" id="disp-rf"></span></td></tr>
-                <tr><th>HINDLEG L</th><td><span class="pdf-input-display" id="disp-lh"></span></td></tr>
-                <tr><th>HINDLEG R</th><td><span class="pdf-input-display" id="disp-rh"></span></td></tr>
-                <tr><th>BODY</th><td><span class="pdf-input-display" id="disp-body"></span></td></tr>
-                <tr><th>STATUS</th><td><span class="pdf-input-display" id="disp-status"></span></td></tr>
-            </table>
+            </div>
+            
+            <div class="approval-box">
+                <label class="toggle-row">
+                    <input type="checkbox" id="approve-chk"> 
+                    <span class="toggle-text">I hereby Approve this Chart</span>
+                </label>
+            </div>
         </div>
-    </div>
+
+        <div id="tab-preview" class="tab-content">
+            <div class="floating-action-container">
+                <button class="primary-btn full-width" onclick="generatePDF()" id="btn-download">
+                    Download PDF
+                </button>
+            </div>
+
+            <div class="pdf-wrapper-scroller">
+                <div id="pdf-preview-container">
+                    <div id="watermark">DRAFT</div>
+                    <div class="pdf-section-header"><h3>VETERINARY MARKINGS CHART</h3></div>
+                    
+                    <div class="pdf-diagram-area" id="pdf-diagram-area">
+                        </div>
+
+                    <table class="pdf-table">
+                        <tr>
+                            <th>HEAD</th>
+                            <td><span class="pdf-input-display" id="disp-head"></span></td>
+                            <th rowspan="8" style="vertical-align:top; background:#fff; width:40%;">
+                                <strong>DETAILS</strong><br><br>
+                                Microchip: <span class="pdf-input-display" id="disp-microchip"></span><br><br>
+                                Sire: Galileo<br>
+                                Dam: Ouija Board<br>
+                                Date: <span class="pdf-input-display" id="disp-date"></span><br><br>
+                                <div style="border:1px solid #333; padding:10px; margin-top:20px;">
+                                    <strong>Vet Signature:</strong><br><br>
+                                    <span style="font-family:'Brush Script MT', cursive; font-size:20px;" id="disp-sig"></span>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr><th>NECK</th><td><span class="pdf-input-display" id="disp-neck"></span></td></tr>
+                        <tr><th>FORELEG L</th><td><span class="pdf-input-display" id="disp-lf"></span></td></tr>
+                        <tr><th>FORELEG R</th><td><span class="pdf-input-display" id="disp-rf"></span></td></tr>
+                        <tr><th>HINDLEG L</th><td><span class="pdf-input-display" id="disp-lh"></span></td></tr>
+                        <tr><th>HINDLEG R</th><td><span class="pdf-input-display" id="disp-rh"></span></td></tr>
+                        <tr><th>BODY</th><td><span class="pdf-input-display" id="disp-body"></span></td></tr>
+                        <tr><th>STATUS</th><td><span class="pdf-input-display" id="disp-status"></span></td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    
+    </main>
+
+    <nav class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('request')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            <span>Request</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('markings')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
+            <span>Markings</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('preview')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><polyline points="9 15 12 18 15 15"></polyline></svg>
+            <span>Preview</span>
+        </button>
+    </nav>
 
     <script src="script.js"></script>
 </body>
