@@ -266,16 +266,31 @@ button.tool-btn.delete-btn:disabled {
     margin: 5px 0 0 0;
 }
 
-/* --- CANVAS AREA --- */
+/* --- CANVAS AREA (FIXED) --- */
 #horse-diagram-container {
     position: relative;
-    width: 100%;
+    width: 100%; /* Full width of parent */
     background: white;
     border: 1px solid var(--border-color);
     border-radius: 8px;
     overflow: hidden;
     margin-top: 10px;
-    /* Remove shadow to focus on drawing */
+}
+
+#horse-image {
+    display: block;
+    width: 100%;
+    height: auto; /* Maintains aspect ratio */
+    pointer-events: none; /* Passes clicks to canvas */
+}
+
+#drawing-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    touch-action: none; /* Prevents scrolling while drawing */
 }
 
 /* --- MARKINGS INPUTS --- */
