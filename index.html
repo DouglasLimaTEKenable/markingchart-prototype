@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HSI Veterinary Markings App</title>
+    <title>HSI Veterinary Markings App (v2.1)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         /* --- VARIABLES --- */
@@ -11,6 +11,7 @@
             --primary-color: #0056b3;
             --bg-color: #f4f4f9;
             --border-color: #ccc;
+            --select-color: #FFD700; 
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -61,6 +62,7 @@
             border: 1px solid var(--border-color);
             border-radius: 5px;
             display: flex;
+            flex-wrap: wrap;
             gap: 10px;
             align-items: center;
         }
@@ -70,11 +72,23 @@
             background: #eee;
             cursor: pointer;
             border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         button.tool-btn.active-tool {
             background-color: var(--primary-color);
             color: white;
             border-color: #003d80;
+        }
+        button.tool-btn.delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border-color: #b02a37;
+        }
+        button.tool-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         /* --- EDIT MODE CANVAS --- */
@@ -92,6 +106,7 @@
             display: block;
             width: 100%;
             height: auto;
+            pointer-events: none; /* Let clicks pass through to canvas */
         }
         #drawing-canvas {
             position: absolute;
@@ -101,10 +116,9 @@
             height: 100%;
             cursor: crosshair;
             touch-action: none;
-			touch-action: none;              /* Disables scrolling/zooming on the canvas */
-		    user-select: none;               /* Disables text selection */
-		    -webkit-tap-highlight-color: transparent; /* Removes blue highlight on tap */
-		}
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
 
         /* --- FORMS --- */
         .form-grid {
@@ -119,13 +133,14 @@
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            box-sizing: border-box;
         }
         .readonly-field {
             background-color: #e9ecef;
             cursor: not-allowed;
         }
 
-        /* --- PDF PREVIEW CONTAINER (A4) --- */
+        /* --- PDF PREVIEW --- */
         #pdf-preview-container {
             width: 210mm;
             min-height: 297mm;
@@ -136,7 +151,6 @@
             position: relative;
             box-sizing: border-box;
         }
-
         #watermark {
             position: absolute;
             top: 50%;
@@ -151,15 +165,12 @@
             border: 5px dashed rgba(255, 0, 0, 0.15);
             padding: 20px;
         }
-
         .pdf-section-header {
             text-align: center;
             border-bottom: 2px solid #333;
             margin-bottom: 10px;
             padding-bottom: 5px;
         }
-
-        /* --- FIXED PREVIEW DIAGRAM (RESPONSIVE) --- */
         .pdf-diagram-area {
             width: 100%; 
             border: 1px solid #333;
@@ -167,60 +178,18 @@
             background: white;
             overflow: hidden;
         }
-
         .pdf-diagram-wrapper {
             position: relative;
             width: 100%;      
             line-height: 0;
         }
-
-        .pdf-diagram-wrapper img {
-            width: 100%;      
-            height: auto;     
-            display: block;
-        }
-
-        .pdf-diagram-wrapper canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;      
-            height: 100%;     
-        }
-
-        /* --- PDF TABLE --- */
-        .pdf-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-        }
-        .pdf-table th, .pdf-table td {
-            border: 1px solid #333;
-            padding: 5px;
-            vertical-align: top;
-        }
+        .pdf-diagram-wrapper img { width: 100%; height: auto; display: block; }
+        .pdf-diagram-wrapper canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .pdf-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .pdf-table th, .pdf-table td { border: 1px solid #333; padding: 5px; vertical-align: top; }
         .pdf-table th { background-color: #f0f0f0; width: 15%; }
-        .pdf-input-display {
-            font-family: 'Courier New', Courier, monospace;
-            font-weight: bold;
-            color: #000;
-            text-transform: uppercase;
-        }
+        .pdf-input-display { font-family: 'Courier New', Courier, monospace; font-weight: bold; text-transform: uppercase; }
     </style>
-	
-	<link rel="manifest" href="manifest.json">
-	<meta name="theme-color" content="#0056b3">
-	<link rel="apple-touch-icon" href="icon-192.png">
-
-	<script>
-		if ('serviceWorker' in navigator) {
-			window.addEventListener('load', () => {
-				navigator.serviceWorker.register('./sw.js')
-					.then(reg => console.log('Service Worker registered!', reg))
-					.catch(err => console.log('Service Worker failed:', err));
-			});
-		}
-	</script>
 </head>
 <body>
 
@@ -244,19 +213,30 @@
 
     <div id="tab-markings" class="tab-content">
         <h2>Markings Chart</h2>
+        
         <div class="toolbar">
-            <strong>Tools:</strong>
+            <button class="tool-btn" id="btn-select" onclick="setTool('select')" title="Click to Select, Drag to Move">
+                ✋ Select/Move
+            </button>
+            <div style="width:1px; height:30px; background:#ccc; margin:0 5px;"></div>
+            
             <button class="tool-btn active-tool" onclick="setTool('black-pen')">Black Pen</button>
-            <button class="tool-btn" onclick="setTool('red-pen')">Red Pen (White Marks)</button>
-            <button class="tool-btn" onclick="setTool('symbol-m')">Microchip 'M'</button>
-            <button class="tool-btn" onclick="setTool('symbol-x')">Whorl 'X'</button>
-            <button class="tool-btn" style="margin-left:auto; background:#ffdddd;" onclick="clearCanvas()">Clear All</button>
+            <button class="tool-btn" onclick="setTool('red-pen')">Red Pen</button>
+            <button class="tool-btn" onclick="setTool('symbol-m')"> 'M'</button>
+            <button class="tool-btn" onclick="setTool('symbol-x')"> 'X'</button>
+
+            <div style="margin-left:auto; display:flex; gap:5px;">
+                <button class="tool-btn" onclick="undoLast()">Undo</button>
+                <button class="tool-btn delete-btn" id="btn-delete" onclick="deleteSelected()" disabled>Delete Selected</button>
+                <button class="tool-btn" style="background:#ffdddd;" onclick="clearAll()">Clear All</button>
+            </div>
         </div>
 
         <div id="horse-diagram-container">
             <img id="horse-image" src="" alt="Horse Outline">
             <canvas id="drawing-canvas"></canvas>
         </div>
+        <p style="font-size:0.85em; color:#666; margin-top:5px;">* To move or delete a mark, choose the <strong>✋ Select/Move</strong> tool, click the mark, then drag it or click 'Delete Selected'.</p>
 
         <h3>Markings Description</h3>
         <table id="examination-table" style="width:100%; border-collapse:collapse; margin-top:20px;">
@@ -278,14 +258,12 @@
         
         <div style="margin-top:20px; padding:15px; background:#e9ecef; border-radius:5px;">
             <label><input type="checkbox" id="approve-chk"> <strong>I hereby Approve this Markings Chart</strong></label>
-            <p style="font-size:0.9em; color:#666;">Checking this will remove the DRAFT watermark.</p>
         </div>
     </div>
 
     <div id="tab-preview" class="tab-content">
         <div class="toolbar">
             <button class="tool-btn" onclick="generatePDF()" id="btn-download" style="background:#28a745; color:white; font-weight:bold;">Download PDF</button>
-            <span style="margin-left:10px; font-size:0.9em; color:#666;">(Generates PDF from the view below)</span>
         </div>
 
         <div id="pdf-preview-container">
@@ -323,7 +301,23 @@
     </div>
 
     <script>
-    // --- LOGIC ---
+    // --- VARIABLES & STATE ---
+    const canvas = document.getElementById('drawing-canvas');
+    const ctx = canvas.getContext('2d');
+    const horseImage = document.getElementById('horse-image');
+    
+    // The "Shapes" array is the single source of truth
+    let shapes = []; 
+    let selectedShapeIndex = -1; // -1 means nothing selected
+    
+    let currentTool = 'black-pen';
+    let isDragging = false;
+    let dragStartPos = {x:0, y:0};
+    
+    // For Drawing Paths
+    let currentPathPoints = [];
+
+    // --- SETUP ---
     function switchTab(tabId) {
         if (tabId === 'preview') renderPreview();
         
@@ -336,180 +330,298 @@
         if (tabId === 'markings') setTimeout(resizeCanvas, 50);
     }
 
-    // --- DRAWING ENGINE ---
-    const canvas = document.getElementById('drawing-canvas');
-    const ctx = canvas.getContext('2d');
-    const horseImage = document.getElementById('horse-image');
-    let currentTool = 'black-pen';
-    let isDrawing = false;
-
-    // --- CANVAS SETUP ---
-    function resizeCanvas() {
-        const w = horseImage.naturalWidth > 0 ? horseImage.clientWidth : 0;
-        const h = horseImage.naturalHeight > 0 ? horseImage.clientHeight : 0;
-        
-        if (w > 0 && h > 0 && (canvas.width !== w || canvas.height !== h)) {
-            canvas.width = w;
-            canvas.height = h;
-        }
-    }
-
     function initImage() {
         const imgPath = 'Section1.png'; 
         const img = new Image();
-        img.crossOrigin = 'Anonymous'; 
+        img.crossOrigin = 'Anonymous';
         img.src = imgPath;
         
         img.onload = function() {
-            // Convert to Base64 for PDF safety
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = img.width;
             tempCanvas.height = img.height;
             const tempCtx = tempCanvas.getContext('2d');
             tempCtx.drawImage(img, 0, 0);
             
-            horseImage.src = tempCanvas.toDataURL('image/png'); 
+            horseImage.src = tempCanvas.toDataURL('image/png');
             setTimeout(resizeCanvas, 50);
         };
-        img.onerror = () => console.log("Image load check failed or local file missing");
+        img.onerror = () => {
+            horseImage.style.background = "#eee";
+            horseImage.style.height = "300px";
+            horseImage.alt = "Image not found (Section1.png)";
+        }
+    }
+
+    function resizeCanvas() {
+        const w = horseImage.naturalWidth > 0 ? horseImage.clientWidth : horseImage.offsetWidth;
+        const h = horseImage.naturalHeight > 0 ? horseImage.clientHeight : horseImage.offsetHeight;
+        
+        if (w > 0 && h > 0 && (canvas.width !== w || canvas.height !== h)) {
+            canvas.width = w;
+            canvas.height = h;
+            redrawCanvas(); 
+        }
     }
 
     initImage();
     window.addEventListener('resize', resizeCanvas);
 
-    // --- ROBUST INPUT HANDLER (MOUSE + TOUCH) ---
+    // --- TOOL SWITCHING ---
+    function setTool(tool) {
+        currentTool = tool;
+        if (tool !== 'select') {
+            selectedShapeIndex = -1;
+            document.getElementById('btn-delete').disabled = true;
+            canvas.style.cursor = "crosshair";
+        } else {
+            canvas.style.cursor = "default";
+        }
+        
+        document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active-tool'));
+        const btn = document.querySelector(`button[onclick="setTool('${tool}')"]`);
+        if(btn) btn.classList.add('active-tool');
+        
+        redrawCanvas();
+    }
+
+    // --- INPUT HANDLING ---
     function getPos(e) {
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
-        
-        // Robust check for Touch vs Mouse
-        let clientX, clientY;
+        let cx, cy;
         if (e.changedTouches && e.changedTouches.length > 0) {
-            clientX = e.changedTouches[0].clientX;
-            clientY = e.changedTouches[0].clientY;
+            cx = e.changedTouches[0].clientX;
+            cy = e.changedTouches[0].clientY;
         } else {
-            clientX = e.clientX;
-            clientY = e.clientY;
+            cx = e.clientX;
+            cy = e.clientY;
         }
-
-        return {
-            x: (clientX - rect.left) * scaleX,
-            y: (clientY - rect.top) * scaleY
-        };
+        return { x: (cx - rect.left) * scaleX, y: (cy - rect.top) * scaleY };
     }
 
-    function setTool(tool) {
-        currentTool = tool;
-        document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active-tool'));
-        document.querySelector(`button[onclick="setTool('${tool}')"]`).classList.add('active-tool');
-    }
-
-    // --- DRAWING FUNCTIONS ---
-    function startDraw(e) {
-        // Stop browser from scrolling/zooming when touching canvas
+    function startAction(e) {
         if (e.cancelable) e.preventDefault();
-        
         const pos = getPos(e);
+        isDragging = true;
+        dragStartPos = pos;
 
-        // Handle Stamps (M / X)
-        if (currentTool === 'symbol-m' || currentTool === 'symbol-x') {
-            ctx.font = 'bold 24px Arial';
-            ctx.fillStyle = (currentTool === 'symbol-m') ? 'red' : 'black';
-            const text = (currentTool === 'symbol-m') ? 'M' : 'X';
-            ctx.fillText(text, pos.x - 8, pos.y + 8);
-            return;
+        if (currentTool === 'select') {
+            const foundIndex = findShapeAt(pos);
+            selectedShapeIndex = foundIndex;
+            document.getElementById('btn-delete').disabled = (selectedShapeIndex === -1);
+            redrawCanvas();
+        } else if (currentTool.startsWith('symbol')) {
+            const type = currentTool === 'symbol-m' ? 'M' : 'X';
+            const color = currentTool === 'symbol-m' ? 'red' : 'black';
+            shapes.push({
+                type: 'symbol',
+                text: type,
+                x: pos.x,
+                y: pos.y,
+                color: color
+            });
+            isDragging = false; 
+            redrawCanvas();
+        } else {
+            // Start Path
+            currentPathPoints = [{x: pos.x, y: pos.y}];
+            // Redraw immediately so we don't wait for first move
+            redrawCanvas();
         }
-        
-        // Handle Pens
-        isDrawing = true;
-        ctx.beginPath();
-        ctx.moveTo(pos.x, pos.y);
-        ctx.lineWidth = 3;
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = (currentTool === 'red-pen') ? 'red' : 'black';
     }
 
-    function moveDraw(e) {
-        if (!isDrawing) return;
-        if (e.cancelable) e.preventDefault(); // Stop scrolling while dragging
-        
+    function moveAction(e) {
+        if (!isDragging) return;
+        if (e.cancelable) e.preventDefault();
         const pos = getPos(e);
-        
-        // Draw the line segment
-        ctx.lineTo(pos.x, pos.y);
-        ctx.stroke();
-        
-        // MOBILE FIX: Reset path to current point.
-        // This prevents "long path" glitches on some mobile browsers.
-        ctx.beginPath();
-        ctx.moveTo(pos.x, pos.y);
+
+        if (currentTool === 'select' && selectedShapeIndex !== -1) {
+            // Move Logic
+            const dx = pos.x - dragStartPos.x;
+            const dy = pos.y - dragStartPos.y;
+            const shape = shapes[selectedShapeIndex];
+
+            if (shape.type === 'symbol') {
+                shape.x += dx;
+                shape.y += dy;
+            } else if (shape.type === 'path') {
+                shape.points.forEach(p => {
+                    p.x += dx;
+                    p.y += dy;
+                });
+            }
+            dragStartPos = pos;
+            redrawCanvas();
+        } else if (currentTool.endsWith('pen')) {
+            // Draw Logic: Add point, then redraw the whole scene including the active line
+            currentPathPoints.push({x: pos.x, y: pos.y});
+            redrawCanvas(); 
+        }
     }
 
-    function endDraw(e) {
-        if (isDrawing) {
-            e.preventDefault();
-            isDrawing = false; 
-            ctx.closePath(); 
+    function endAction(e) {
+        if (!isDragging) return;
+        if (e.cancelable) e.preventDefault();
+        isDragging = false;
+
+        // Finalize the path
+        if (currentTool.endsWith('pen') && currentPathPoints.length > 1) {
+            shapes.push({
+                type: 'path',
+                points: [...currentPathPoints],
+                color: (currentTool === 'red-pen') ? 'red' : 'black'
+            });
+            currentPathPoints = [];
+            redrawCanvas();
+        }
+        // If it was just a dot (length 1), discard or handle as dot, 
+        // here we simply discard to avoid single-pixel noise.
+        currentPathPoints = [];
+    }
+
+    // --- HIT DETECTION ---
+    function findShapeAt(pos) {
+        for (let i = shapes.length - 1; i >= 0; i--) {
+            const s = shapes[i];
+            if (s.type === 'symbol') {
+                const dist = Math.sqrt((pos.x - s.x)**2 + (pos.y - s.y)**2);
+                if (dist < 20) return i;
+            } else if (s.type === 'path') {
+                for (let p of s.points) {
+                    const dist = Math.sqrt((pos.x - p.x)**2 + (pos.y - p.y)**2);
+                    if (dist < 10) return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    // --- RENDERING ENGINE (UPDATED) ---
+    function redrawCanvas() {
+        // 1. Clear Screen
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 2. Draw Saved Shapes
+        shapes.forEach((s, index) => {
+            const isSelected = (index === selectedShapeIndex);
+            
+            ctx.shadowBlur = isSelected ? 10 : 0;
+            ctx.shadowColor = 'gold';
+
+            if (s.type === 'path') {
+                if(s.points.length < 2) return;
+                ctx.beginPath();
+                ctx.moveTo(s.points[0].x, s.points[0].y);
+                for(let i=1; i<s.points.length; i++) {
+                    ctx.lineTo(s.points[i].x, s.points[i].y);
+                }
+                ctx.lineCap = 'round';
+                ctx.lineWidth = isSelected ? 5 : 3;
+                ctx.strokeStyle = s.color;
+                ctx.stroke();
+            } else if (s.type === 'symbol') {
+                ctx.font = isSelected ? 'bold 28px Arial' : 'bold 24px Arial';
+                ctx.fillStyle = s.color;
+                ctx.fillText(s.text, s.x - 8, s.y + 8);
+            }
+            
+            ctx.shadowBlur = 0; 
+        });
+
+        // 3. Draw Active Line (The one you are currently dragging)
+        if (currentPathPoints.length > 0) {
+            ctx.beginPath();
+            ctx.moveTo(currentPathPoints[0].x, currentPathPoints[0].y);
+            for(let i=1; i<currentPathPoints.length; i++) {
+                ctx.lineTo(currentPathPoints[i].x, currentPathPoints[i].y);
+            }
+            ctx.lineCap = 'round';
+            ctx.lineWidth = 3;
+            // Determine color based on active tool
+            ctx.strokeStyle = (currentTool === 'red-pen') ? 'red' : 'black';
+            ctx.stroke();
+        }
+    }
+
+    // --- BUTTON ACTIONS ---
+    function deleteSelected() {
+        if (selectedShapeIndex !== -1) {
+            shapes.splice(selectedShapeIndex, 1);
+            selectedShapeIndex = -1;
+            document.getElementById('btn-delete').disabled = true;
+            redrawCanvas();
+        }
+    }
+
+    function undoLast() {
+        if(shapes.length > 0) {
+            shapes.pop();
+            selectedShapeIndex = -1;
+            redrawCanvas();
+        }
+    }
+
+    function clearAll() {
+        if(confirm("Clear the entire chart?")) {
+            shapes = [];
+            selectedShapeIndex = -1;
+            redrawCanvas();
         }
     }
 
     // --- EVENT LISTENERS ---
-    // Mouse
-    canvas.addEventListener('mousedown', startDraw);
-    canvas.addEventListener('mousemove', moveDraw);
-    canvas.addEventListener('mouseup', endDraw);
-    canvas.addEventListener('mouseout', endDraw);
-
-    // Touch (Passive: false is CRITICAL for preventing scroll)
+    canvas.addEventListener('mousedown', startAction);
+    canvas.addEventListener('mousemove', moveAction);
+    canvas.addEventListener('mouseup', endAction);
+    canvas.addEventListener('mouseout', endAction);
+    
     const touchOpt = { passive: false };
-    canvas.addEventListener('touchstart', startDraw, touchOpt);
-    canvas.addEventListener('touchmove', moveDraw, touchOpt);
-    canvas.addEventListener('touchend', endDraw, touchOpt);
-    canvas.addEventListener('touchcancel', endDraw, touchOpt);
+    canvas.addEventListener('touchstart', startAction, touchOpt);
+    canvas.addEventListener('touchmove', moveAction, touchOpt);
+    canvas.addEventListener('touchend', endAction, touchOpt);
+    canvas.addEventListener('touchcancel', endAction, touchOpt);
 
-    function clearCanvas() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
 
-    // --- PREVIEW ---
+    // --- PREVIEW & PDF ---
     function renderPreview() {
-        try {
-            const container = document.getElementById('pdf-diagram-area');
-            container.innerHTML = '';
+        // Reset canvas highlight for PDF
+        const prevSelect = selectedShapeIndex;
+        selectedShapeIndex = -1; 
+        redrawCanvas();
 
-            const wrapper = document.createElement('div');
-            wrapper.className = 'pdf-diagram-wrapper';
-            wrapper.appendChild(horseImage.cloneNode());
+        const container = document.getElementById('pdf-diagram-area');
+        container.innerHTML = '';
 
-            const pCanvas = document.createElement('canvas');
-            pCanvas.width = canvas.width;
-            pCanvas.height = canvas.height;
-            pCanvas.getContext('2d').drawImage(canvas, 0, 0);
-            
-            wrapper.appendChild(pCanvas);
-            container.appendChild(wrapper);
+        const wrapper = document.createElement('div');
+        wrapper.className = 'pdf-diagram-wrapper';
+        wrapper.appendChild(horseImage.cloneNode());
 
-            // Field Mapping
-            const map = (id, dest) => {
-                const el = document.getElementById(id);
-                if(el) document.getElementById(dest).innerText = el.value || '';
-            }
-            map('input-head', 'disp-head');
-            map('input-neck', 'disp-neck');
-            map('input-lf', 'disp-lf');
-            map('input-rf', 'disp-rf');
-            map('input-lh', 'disp-lh');
-            map('input-rh', 'disp-rh');
-            map('input-body', 'disp-body');
-            map('input-microchip', 'disp-microchip');
-            map('exam-date', 'disp-date');
+        const pCanvas = document.createElement('canvas');
+        pCanvas.width = canvas.width;
+        pCanvas.height = canvas.height;
+        pCanvas.getContext('2d').drawImage(canvas, 0, 0);
+        
+        wrapper.appendChild(pCanvas);
+        container.appendChild(wrapper);
 
-            const isApproved = document.getElementById('approve-chk').checked;
-            document.getElementById('disp-status').innerText = isApproved ? 'APPROVED' : 'DRAFT';
-            document.getElementById('watermark').style.display = isApproved ? 'none' : 'block';
-            document.getElementById('disp-sig').innerText = isApproved ? "John Doe, DVM" : "";
-        } catch (e) { console.error(e); }
+        // Map inputs
+        const ids = ['head','neck','lf','rf','lh','rh','body','microchip'];
+        ids.forEach(id => {
+            const el = document.getElementById('input-'+id);
+            if(el) document.getElementById('disp-'+id).innerText = el.value || '';
+        });
+        document.getElementById('disp-date').innerText = document.getElementById('exam-date').value;
+
+        const isApproved = document.getElementById('approve-chk').checked;
+        document.getElementById('disp-status').innerText = isApproved ? 'APPROVED' : 'DRAFT';
+        document.getElementById('watermark').style.display = isApproved ? 'none' : 'block';
+        document.getElementById('disp-sig').innerText = isApproved ? "John Doe, DVM" : "";
+
+        // Restore selection state in editor
+        selectedShapeIndex = prevSelect;
+        redrawCanvas();
     }
 
     function generatePDF() {
@@ -531,6 +643,6 @@
         .then(() => { btn.innerText = txt; btn.disabled = false; })
         .catch(e => { alert(e.message); btn.innerText = txt; btn.disabled = false; });
     }
-</script>
+    </script>
 </body>
 </html>
