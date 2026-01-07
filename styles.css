@@ -1,0 +1,183 @@
+/* --- VARIABLES --- */
+:root {
+    --primary-color: #0056b3;
+    --bg-color: #f4f4f9;
+    --border-color: #ccc;
+    --select-color: #FFD700; 
+}
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    background-color: var(--bg-color);
+    color: #333;
+}
+
+/* --- NAVIGATION --- */
+.tab-nav {
+    display: flex;
+    background-color: #333;
+    padding: 10px 20px 0 20px;
+}
+.tab-btn {
+    background-color: #555;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    cursor: pointer;
+    margin-right: 5px;
+    border-radius: 5px 5px 0 0;
+    font-size: 16px;
+    transition: background 0.3s;
+}
+.tab-btn:hover { background-color: #777; }
+.tab-btn.active {
+    background-color: var(--bg-color);
+    color: #333;
+    border-bottom: 2px solid var(--primary-color);
+    font-weight: bold;
+}
+
+/* --- CONTENT CONTAINERS --- */
+.tab-content {
+    display: none;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.tab-content.active { display: block; }
+
+/* --- TOOLBAR --- */
+.toolbar {
+    margin-bottom: 15px;
+    padding: 10px;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+button.tool-btn {
+    padding: 8px 12px;
+    border: 1px solid #999;
+    background: #eee;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+button.tool-btn.active-tool {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: #003d80;
+}
+button.tool-btn.delete-btn {
+    background-color: #dc3545;
+    color: white;
+    border-color: #b02a37;
+}
+button.tool-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* --- EDIT MODE CANVAS --- */
+#horse-diagram-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    max-width: 100%; 
+    line-height: 0;
+    border: 1px solid #ccc;
+    background-color: white;
+    min-height: 200px;
+}
+#horse-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    pointer-events: none; /* Let clicks pass through to canvas */
+}
+#drawing-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+    touch-action: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* --- FORMS --- */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9em; }
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+.readonly-field {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+}
+
+/* --- PDF PREVIEW --- */
+#pdf-preview-container {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    background: white;
+    padding: 10mm;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    position: relative;
+    box-sizing: border-box;
+}
+#watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 150px;
+    color: rgba(255, 0, 0, 0.15);
+    font-weight: bold;
+    pointer-events: none;
+    z-index: 999;
+    display: none;
+    border: 5px dashed rgba(255, 0, 0, 0.15);
+    padding: 20px;
+}
+.pdf-section-header {
+    text-align: center;
+    border-bottom: 2px solid #333;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+}
+.pdf-diagram-area {
+    width: 100%; 
+    border: 1px solid #333;
+    margin-bottom: 10px;
+    background: white;
+    overflow: hidden;
+}
+.pdf-diagram-wrapper {
+    position: relative;
+    width: 100%;      
+    line-height: 0;
+}
+.pdf-diagram-wrapper img { width: 100%; height: auto; display: block; }
+.pdf-diagram-wrapper canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.pdf-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.pdf-table th, .pdf-table td { border: 1px solid #333; padding: 5px; vertical-align: top; }
+.pdf-table th { background-color: #f0f0f0; width: 15%; }
+.pdf-input-display { font-family: 'Courier New', Courier, monospace; font-weight: bold; text-transform: uppercase; }
