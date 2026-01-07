@@ -58,7 +58,7 @@
                 <div class="toolbar">
                     <div class="tool-group">
                         <button class="tool-btn" onclick="setTool('view-pan')" title="Pan View">
-                            <span style="font-size: 18px;">✥</span> <span class="btn-label">Pan</span>
+                             <span style="font-size: 18px;">✥</span> <span class="btn-label">Pan</span>
                         </button>
                         <button class="tool-btn" id="btn-select" onclick="setTool('select')">
                             <span>✋</span> <span class="btn-label">Move</span>
@@ -91,9 +91,9 @@
 
             <div id="horse-diagram-container">
                 <div class="zoom-controls">
-                    <button onclick="updateZoom(0.2)">+</button>
-                    <button onclick="updateZoom(-0.2)">-</button>
-                    <button onclick="resetZoom()">R</button>
+                    <button onclick="updateZoom(0.2)" title="Zoom In">+</button>
+                    <button onclick="updateZoom(-0.2)" title="Zoom Out">-</button>
+                    <button onclick="resetZoom()" title="Reset View">R</button>
                 </div>
 
                 <div id="zoom-wrapper">
@@ -101,7 +101,6 @@
                     <canvas id="drawing-canvas"></canvas>
                 </div>
             </div>
-
             <div class="card mt-20">
                 <h3 class="section-title">Markings Description</h3>
                 <div class="input-stack">
