@@ -189,47 +189,48 @@ body {
     padding-right: 16px;
 }
 
+/* MOBILE DEFAULT: Grid Layout */
 .toolbar {
-    display: flex;
-    overflow-x: auto;
-    gap: 12px;
-    padding: 8px 4px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 Columns forces 3 rows (4-4-1) for 9 items */
+    gap: 8px;
+    padding: 12px;
     background: white;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    scrollbar-width: none; /* Hide scrollbar Firefox */
+    overflow-x: visible; /* Disable scroll on mobile */
 }
-.toolbar::-webkit-scrollbar { display: none; } /* Hide scrollbar Chrome */
 
+/* Flatten the HTML groups so buttons act as direct Grid children */
 .tool-group {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    flex-shrink: 0;
+    display: contents;
 }
 
+/* Hide vertical dividers in Grid mode */
 .tool-divider {
-    width: 1px;
-    height: 24px;
-    background: #ddd;
-    flex-shrink: 0;
+    display: none;
 }
 
-/* Tool Buttons */
+/* Tool Buttons - Mobile Stacked Style */
 button.tool-btn {
-    height: 44px; /* Minimum touch target */
-    min-width: 44px;
-    padding: 0 12px;
+    height: auto; 
+    min-height: 56px; /* Taller touch target for stacked layout */
+    min-width: 0;     /* Allow shrinking to fit grid */
+    padding: 6px 2px;
     border: 1px solid transparent;
     background: #f2f2f7;
     border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #333;
+    
+    /* Stack Icon and Text */
     display: flex;
+    flex-direction: column; 
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 4px;
+    
+    color: #333;
+    font-weight: 600;
+    font-size: 11px; /* Smaller font for grid */
     white-space: nowrap;
 }
 
@@ -239,7 +240,10 @@ button.tool-btn.active-tool {
     box-shadow: 0 2px 5px rgba(0,122,255,0.3);
 }
 
-button.tool-btn.icon-only { padding: 0; font-size: 18px; }
+button.tool-btn.icon-only { 
+    font-size: 20px; 
+    padding: 0;
+}
 
 button.tool-btn.delete-btn {
     background-color: #ffe5e5;
@@ -257,13 +261,53 @@ button.tool-btn.delete-btn:disabled {
 .dot-icon { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.5); }
 .dot-icon.black { background: black; }
 .dot-icon.red { background: red; }
-.btn-label { font-size: 13px; }
+.btn-label { font-size: 11px; }
 
 .helper-text {
     font-size: 12px;
     color: #888;
     text-align: center;
     margin: 5px 0 0 0;
+}
+
+/* --- TABLET & DESKTOP OVERRIDES (>600px) --- */
+/* Revert to Horizontal Flex Scroll */
+@media(min-width: 600px) {
+    .toolbar {
+        display: flex;
+        grid-template-columns: none;
+        overflow-x: auto;
+        gap: 12px;
+        padding: 8px 4px;
+        scrollbar-width: none;
+    }
+    .toolbar::-webkit-scrollbar { display: none; }
+
+    .tool-group {
+        display: flex; /* Restore flex container */
+        gap: 8px;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    .tool-divider {
+        display: block; /* Restore divider */
+        width: 1px;
+        height: 24px;
+        background: #ddd;
+        flex-shrink: 0;
+    }
+
+    button.tool-btn {
+        flex-direction: row; /* Icon next to text */
+        height: 44px;
+        min-width: 44px;
+        padding: 0 12px;
+        font-size: 14px;
+        gap: 6px;
+    }
+    
+    .btn-label { font-size: 13px; }
 }
 
 /* --- CANVAS AREA --- */
