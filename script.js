@@ -13,23 +13,21 @@ let currentTool = 'black-pen';
 
 // Interaction State
 let isDragging = false;
-// dragStartPos now stores raw screen coordinates (clientX/Y) for delta calculations
 let dragStartPos = {x:0, y:0}; 
 
 // Zoom & Pan State
 let scale = 1;
 let panX = 0;
 let panY = 0;
-const MIN_ZOOM = 0.5;
+// Adjusted Min zoom to allow fitting smaller screens if necessary
+const MIN_ZOOM = 0.2; 
 const MAX_ZOOM = 4;
-// Helper to store pan offset at the start of a drag gesture
 let panStart = { x: 0, y: 0 };
 
 // For Drawing Paths
 let currentPathPoints = [];
 
 // --- SETUP ---
-// ... (switchTab function remains exactly the same) ...
 function switchTab(tabId) {
     if (tabId === 'preview') renderPreview();
     
@@ -39,7 +37,13 @@ function switchTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     document.getElementById(`tab-${tabId}`).classList.add('active');
 
-    if (tabId === 'markings') setTimeout(resizeCanvas, 50);
+    // Important: When switching back to markings, ensure it fits correctly again
+    if (tabId === 'markings') {
+         setTimeout(() => {
+             resizeCanvas();
+             resetZoom();
+         }, 50);
+    }
 }
 
 
@@ -50,32 +54,26 @@ function initImage() {
     img.src = imgPath;
     
     img.onload = function() {
-        // Load image into the DOM element
         horseImage.src = imgPath;
-        // Important: Reset view on fresh load
-        resetZoom();
-        // Resize canvas to match the natural image dimensions once loaded
-        setTimeout(resizeCanvas, 50);
+        // 1. Set internal resolution to match natural image size first
+        resizeCanvas();
+        // 2. Calculate the fit scale and center it
+        setTimeout(resetZoom, 10);
     };
     img.onerror = () => {
         horseImage.style.background = "#eee";
         horseImage.alt = "Image not found (Section1.png)";
-        // Ensure wrapper has size even if image fails, so pan works reasonably
         wrapper.style.width = "800px"; wrapper.style.height = "600px";
     }
 }
 
 function resizeCanvas() {
-    // We now size the internal canvas resolution to match the image's natural size.
-    // CSS scaling handles the display size.
     const w = horseImage.naturalWidth;
     const h = horseImage.naturalHeight;
     
     if (w > 0 && h > 0) {
         canvas.width = w;
         canvas.height = h;
-        // Force the wrapper to explicitly match the natural image size
-        // This ensures the CSS transform origin works predictably.
         wrapper.style.width = w + "px";
         wrapper.style.height = h + "px";
         redrawCanvas(); 
@@ -83,65 +81,71 @@ function resizeCanvas() {
 }
 
 initImage();
-window.addEventListener('resize', resizeCanvas);
+// If window resizes, re-calculate the "fit"
+window.addEventListener('resize', () => {
+    resizeCanvas();
+    resetZoom();
+});
 
-// --- ZOOM & PAN LOGIC (NEW) ---
+// --- ZOOM & PAN LOGIC ---
 
 function updateZoom(delta) {
     let newScale = scale + delta;
-    // Clamp zoom levels
     if (newScale < MIN_ZOOM) newScale = MIN_ZOOM;
     if (newScale > MAX_ZOOM) newScale = MAX_ZOOM;
     
     scale = newScale;
-    // Re-clamp pan to ensure we don't zoom the image out of view
     clampPan();
     applyTransform();
 }
 
+// --- REWRITTEN RESETZOOM TO "FIT" IMAGE ---
 function resetZoom() {
-    scale = 1;
-    panX = 0;
-    panY = 0;
-    // Ensure transition is active for the reset
-    wrapper.style.transition = "transform 0.2s ease-out";
+    const containerW = container.clientWidth;
+    const containerH = container.clientHeight;
+    const imageW = horseImage.naturalWidth;
+    const imageH = horseImage.naturalHeight;
+
+    // Safety check to prevent division by zero if image hasn't loaded
+    if (imageW === 0 || imageH === 0 || containerW === 0 || containerH === 0) {
+        scale = 1; panX = 0; panY = 0; applyTransform(); return;
+    }
+
+    // 1. Calculate ratio needed to fit width vs height
+    const scaleX = containerW / imageW;
+    const scaleY = containerH / imageH;
+
+    // 2. Use the smaller ratio to ensure the whole image fits ("contain")
+    // Optional: Math.min(scaleX, scaleY, 1) if you never want it to upscale initially.
+    scale = Math.min(scaleX, scaleY);
+
+    // 3. Calculate centering offsets
+    const scaledWidth = imageW * scale;
+    const scaledHeight = imageH * scale;
+    panX = (containerW - scaledWidth) / 2;
+    panY = (containerH - scaledHeight) / 2;
+
+    // Ensure smooth transition for the reset action
+    wrapper.style.transition = "transform 0.3s ease-out";
     applyTransform();
 }
 
 function applyTransform() {
-    // Apply the CSS transform to the wrapper element
     wrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
 }
 
 function clampPan() {
-    // Optional: Implement bounds to stop the user panning the image completely off-screen.
-    // A simple approach is to ensure the center of the content cannot leave the viewport.
-    const viewW = container.clientWidth;
-    const viewH = container.clientHeight;
-    const contentW = wrapper.offsetWidth * scale;
-    const contentH = wrapper.offsetHeight * scale;
-
-    // Calculate reasonable bounds based on viewport vs content size
-    const maxPanX = viewW / 2;
-    const minPanX = viewW / 2 - contentW;
-    const maxPanY = viewH / 2;
-    const minPanY = viewH / 2 - contentH;
-
-    // Apply clamping if you want strict boundaries. For now, leaving flexible for better UX.
-    // To enable strict bounds, uncomment below:
-    // panX = Math.min(maxPanX, Math.max(minPanX, panX));
-    // panY = Math.min(maxPanY, Math.max(minPanY, panY));
+    // (Optional bounds logic can go here if desired later)
 }
 
 
-// --- TOOL SWITCHING (UPDATED) ---
+// --- TOOL SWITCHING ---
 function setTool(tool) {
     currentTool = tool;
-    selectedShapeIndex = -1; // Deselect on tool change
+    selectedShapeIndex = -1; 
     
     const helperText = document.getElementById('helper-text');
 
-    // Update Cursor and UI based on tool
     if (tool === 'view-pan') {
         canvas.style.cursor = "grab";
         if(helperText) helperText.innerText = "Click and drag to Pan the view.";
@@ -150,7 +154,6 @@ function setTool(tool) {
         document.getElementById('btn-delete').disabled = true;
         if(helperText) helperText.innerText = "Click to Select marks. Drag to move.";
     } else {
-        // Drawing tools
         canvas.style.cursor = "crosshair";
         document.getElementById('btn-delete').disabled = true;
         if(helperText) helperText.innerText = "Draw on the chart.";
@@ -163,9 +166,8 @@ function setTool(tool) {
     redrawCanvas();
 }
 
-// --- COORDINATE MAPPING (CRITICAL REWRITE) ---
+// --- COORDINATE MAPPING ---
 function getPos(e) {
-    // 1. Get raw screen coordinates (clientX/Y)
     let cx, cy;
     if (e.changedTouches && e.changedTouches.length > 0) {
         cx = e.changedTouches[0].clientX;
@@ -175,23 +177,18 @@ function getPos(e) {
         cy = e.clientY;
     }
 
-    // 2. Get Viewport Container Position
     const rect = container.getBoundingClientRect();
-
-    // 3. Calculate coordinates relative to the top-left of the Viewport
     const viewportRelX = cx - rect.left;
     const viewportRelY = cy - rect.top;
 
-    // 4. Map Viewport coordinates to Internal Canvas coordinates based on CSS Transform.
-    // Formula: (ViewportCoord - TranslateOffset) / ScaleFactor
-    // This assumes transform-origin is "0 0" (top-left).
+    // Map Viewport coordinates back to canvas coordinates accounting for scale and pan
     const canvasX = (viewportRelX - panX) / scale;
     const canvasY = (viewportRelY - panY) / scale;
 
     return { x: canvasX, y: canvasY };
 }
 
-// --- INPUT HANDLING (UPDATED) ---
+// --- INPUT HANDLING ---
 function startAction(e) {
     if (e.cancelable) e.preventDefault();
     
@@ -206,19 +203,17 @@ function startAction(e) {
     }
 
     isDragging = true;
-    dragStartPos = { x: cx, y: cy }; // Store screen coords
+    dragStartPos = { x: cx, y: cy }; 
 
     // --- PANNING LOGIC ---
     if (currentTool === 'view-pan') {
         canvas.style.cursor = "grabbing";
-        // Disable CSS transition for instant dragging response
-        wrapper.style.transition = "none";
+        wrapper.style.transition = "none"; // Instant drag response
         panStart = { x: panX, y: panY };
-        return; // Exit early, don't draw/select
+        return; 
     }
 
     // --- DRAWING/SELECTING LOGIC ---
-    // Get the mapped canvas coordinates for drawing/selection
     const pos = getPos(e);
 
     if (currentTool === 'select') {
@@ -235,7 +230,6 @@ function startAction(e) {
         isDragging = false; 
         redrawCanvas();
     } else {
-        // Start Path
         currentPathPoints = [{x: pos.x, y: pos.y}];
         redrawCanvas();
     }
@@ -245,7 +239,6 @@ function moveAction(e) {
     if (!isDragging) return;
     if (e.cancelable) e.preventDefault();
 
-    // Get raw screen coords
     let cx, cy;
     if (e.changedTouches && e.changedTouches.length > 0) {
         cx = e.changedTouches[0].clientX;
@@ -257,26 +250,20 @@ function moveAction(e) {
 
     // --- PANNING LOGIC ---
     if (currentTool === 'view-pan') {
-        // Calculate delta in screen pixels
         const dx = cx - dragStartPos.x;
         const dy = cy - dragStartPos.y;
-        // Apply delta to initial pan position
         panX = panStart.x + dx;
         panY = panStart.y + dy;
         applyTransform();
-        return; // Exit early
+        return; 
     }
 
 
     // --- DRAWING/MOVING LOGIC ---
-    
     if (currentTool === 'select' && selectedShapeIndex !== -1) {
-        // Calculate movement delta.
-        // 1. Get delta in screen pixels.
+        // Calculate movement delta in canvas units
         const screenDx = cx - dragStartPos.x;
         const screenDy = cy - dragStartPos.y;
-        
-        // 2. Convert screen delta to canvas coordinate delta by dividing by scale.
         const canvasDx = screenDx / scale;
         const canvasDy = screenDy / scale;
 
@@ -290,11 +277,9 @@ function moveAction(e) {
                 p.y += canvasDy;
             });
         }
-        // Important: Reset dragStartPos so next move event calculates delta relative to this one.
-        dragStartPos = { x: cx, y: cy };
+        dragStartPos = { x: cx, y: cy }; // Reset for next incremental move
         redrawCanvas();
     } else if (currentTool.endsWith('pen')) {
-        // For drawing, we need absolute canvas coordinates
         const pos = getPos(e);
         currentPathPoints.push({x: pos.x, y: pos.y});
         redrawCanvas(); 
@@ -308,14 +293,12 @@ function endAction(e) {
 
     if (currentTool === 'view-pan') {
         canvas.style.cursor = "grab";
-        // Re-enable smooth transitions after dragging finishes
-        wrapper.style.transition = "transform 0.1s ease-out";
-        clampPan(); // Ensure it lands within bounds
+        wrapper.style.transition = "transform 0.1s ease-out"; // Re-enable smoothing
+        clampPan(); 
         applyTransform();
         return;
     }
 
-    // Finalize path drawing
     if (currentTool.endsWith('pen') && currentPathPoints.length > 1) {
         shapes.push({
             type: 'path',
