@@ -438,11 +438,32 @@ input[type="checkbox"] {
     border: 5px dashed rgba(255, 0, 0, 0.1);
     padding: 20px;
 }
+
+/* --- PDF PREVIEW STYLES --- */
 .pdf-section-header { text-align: center; border-bottom: 2px solid #333; margin-bottom: 10px; }
-.pdf-diagram-area { width: 100%; border: 1px solid #333; margin-bottom: 10px; background: white; }
-.pdf-diagram-wrapper { position: relative; width: 100%; line-height: 0; }
-.pdf-diagram-wrapper img { width: 100%; height: auto; display: block; }
-.pdf-diagram-wrapper canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.pdf-diagram-area { 
+    width: 100%; 
+    border: 1px solid #333; 
+    margin-bottom: 10px; 
+    background: white; 
+    overflow: hidden; /* Prevents spillover */
+}
+
+.pdf-diagram-wrapper { 
+    position: relative; 
+    width: 100%; 
+}
+
+.pdf-diagram-wrapper img { 
+    width: 100% !important; 
+    height: auto !important; 
+    display: block; 
+}
+
+.pdf-diagram-wrapper canvas { 
+    width: 100% !important; 
+    height: 100% !important; 
+}
 .pdf-table { width: 100%; border-collapse: collapse; font-family: 'Times New Roman', serif; }
 .pdf-table th, .pdf-table td { border: 1px solid #333; padding: 6px; vertical-align: top; font-size: 12px; }
 .pdf-table th { background-color: #f0f0f0; width: 15%; text-align: left; }

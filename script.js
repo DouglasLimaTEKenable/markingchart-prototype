@@ -415,42 +415,62 @@ canvas.addEventListener('touchcancel', endAction, touchOpt);
 
 // --- PREVIEW & PDF ---
 function renderPreview() {
-    // Reset canvas highlight for PDF
-    const prevSelect = selectedShapeIndex;
-    selectedShapeIndex = -1; 
-    redrawCanvas();
-
+    // 1. Clear previous preview
     const container = document.getElementById('pdf-diagram-area');
     container.innerHTML = '';
 
+    // 2. Create a wrapper that forces 100% width of the PDF area
     const wrapper = document.createElement('div');
     wrapper.className = 'pdf-diagram-wrapper';
-    wrapper.appendChild(horseImage.cloneNode());
+    wrapper.style.position = 'relative';
+    wrapper.style.width = '100%';
+    wrapper.style.lineHeight = '0'; // Removes vertical gap under image
 
+    // 3. Clone the horse image
+    // We clone the original DOM element but strip transforms to ensure it shows the "whole" horse
+    const imgClone = horseImage.cloneNode();
+    imgClone.style.width = '100%';      // Force fit width
+    imgClone.style.height = 'auto';     // Maintain aspect ratio
+    imgClone.style.transform = 'none';  // Remove any zoom/pan transforms
+    imgClone.style.maxWidth = 'none';   
+    imgClone.style.maxHeight = 'none';
+    wrapper.appendChild(imgClone);
+
+    // 4. Create a Preview Canvas overlay
+    // We use the full resolution of the original canvas but scale it via CSS to match the image
     const pCanvas = document.createElement('canvas');
     pCanvas.width = canvas.width;
     pCanvas.height = canvas.height;
-    pCanvas.getContext('2d').drawImage(canvas, 0, 0);
     
+    // Draw the current markings onto this new canvas
+    const pCtx = pCanvas.getContext('2d');
+    pCtx.drawImage(canvas, 0, 0);
+
+    // CSS scaling to make the high-res canvas fit the visual image size
+    pCanvas.style.position = 'absolute';
+    pCanvas.style.top = '0';
+    pCanvas.style.left = '0';
+    pCanvas.style.width = '100%';
+    pCanvas.style.height = '100%';
+
     wrapper.appendChild(pCanvas);
     container.appendChild(wrapper);
 
-    // Map inputs
+    // 5. Map Form Inputs to Text
     const ids = ['head','neck','lf','rf','lh','rh','body','microchip'];
     ids.forEach(id => {
         const el = document.getElementById('input-'+id);
-        if(el) document.getElementById('disp-'+id).innerText = el.value || '';
+        const disp = document.getElementById('disp-'+id);
+        if(el && disp) disp.innerText = el.value || '';
     });
-    document.getElementById('disp-date').innerText = document.getElementById('exam-date').value;
+    
+    const dateEl = document.getElementById('exam-date');
+    if(dateEl) document.getElementById('disp-date').innerText = dateEl.value;
 
     const isApproved = document.getElementById('approve-chk').checked;
     document.getElementById('disp-status').innerText = isApproved ? 'APPROVED' : 'DRAFT';
     document.getElementById('watermark').style.display = isApproved ? 'none' : 'block';
     document.getElementById('disp-sig').innerText = isApproved ? "John Doe, DVM" : "";
-
-    // Restore selection state in editor
-    selectedShapeIndex = prevSelect;
-    redrawCanvas();
 }
 
 function generatePDF() {
