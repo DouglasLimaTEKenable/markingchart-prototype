@@ -359,14 +359,16 @@ button.tool-btn.delete-btn:disabled {
 }
 
 /* --- ZOOM CONTROLS OVERLAY --- */
-.zoom-controls {
+zoom-controls {
     position: absolute;
-    top: 15px;
+    /* CHANGE: Move from top to bottom to prevent toolbar overlap */
+    top: auto;
+    bottom: 15px;
     right: 15px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    z-index: 50; /* Ensure above canvas */
+    z-index: 50; 
 }
 
 .zoom-controls button {
