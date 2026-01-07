@@ -57,6 +57,9 @@
             <div class="toolbar-sticky-wrapper">
                 <div class="toolbar">
                     <div class="tool-group">
+                        <button class="tool-btn" onclick="setTool('view-pan')" title="Pan View">
+                            <span style="font-size: 18px;">✥</span> <span class="btn-label">Pan</span>
+                        </button>
                         <button class="tool-btn" id="btn-select" onclick="setTool('select')">
                             <span>✋</span> <span class="btn-label">Move</span>
                         </button>
@@ -83,12 +86,20 @@
                         <button class="tool-btn danger-text" onclick="clearAll()">Clear</button>
                     </div>
                 </div>
-                <p class="helper-text">Select ✋ to move/delete marks.</p>
+                <p class="helper-text" id="helper-text">Select ✥ to Pan, or Pen to Draw.</p>
             </div>
 
             <div id="horse-diagram-container">
-                <img id="horse-image" src="" alt="Horse Outline">
-                <canvas id="drawing-canvas"></canvas>
+                <div class="zoom-controls">
+                    <button onclick="updateZoom(0.2)">+</button>
+                    <button onclick="updateZoom(-0.2)">-</button>
+                    <button onclick="resetZoom()">R</button>
+                </div>
+
+                <div id="zoom-wrapper">
+                    <img id="horse-image" src="" alt="Horse Outline">
+                    <canvas id="drawing-canvas"></canvas>
+                </div>
             </div>
 
             <div class="card mt-20">

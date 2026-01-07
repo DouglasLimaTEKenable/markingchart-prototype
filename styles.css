@@ -266,22 +266,39 @@ button.tool-btn.delete-btn:disabled {
     margin: 5px 0 0 0;
 }
 
-/* --- CANVAS AREA (FIXED) --- */
+/* --- CANVAS AREA --- */
 #horse-diagram-container {
     position: relative;
-    width: 100%; /* Full width of parent */
-    background: white;
+    width: 100%;
+    height: 50vh; /* Fixed height is better for a viewport, or use min-height */
+    min-height: 400px;
+    background: #e0e0e0; /* darker bg to see bounds */
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    overflow: hidden;
+    overflow: hidden; /* THE VIEWPORT CLIP */
     margin-top: 10px;
+    touch-action: none; /* Critical for custom drag handling */
+}
+
+#zoom-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%; /* Will adapt to image */
+    height: 100%;
+    transform-origin: 0 0; /* Scaling from top-left makes math easier */
+    transition: transform 0.1s ease-out; /* Smooth zoom, overridden by JS during drag */
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
 }
 
 #horse-image {
     display: block;
-    width: 100%;
-    height: auto; /* Maintains aspect ratio */
-    pointer-events: none; /* Passes clicks to canvas */
+    width: auto;
+    max-width: none; /* Allow image to exceed container for scrolling */
+    height: 100%;    /* Fit to height initially */
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
 }
 
 #drawing-canvas {
@@ -290,7 +307,38 @@ button.tool-btn.delete-btn:disabled {
     left: 0;
     width: 100%;
     height: 100%;
-    touch-action: none; /* Prevents scrolling while drawing */
+    touch-action: none;
+}
+
+/* --- ZOOM CONTROLS --- */
+.zoom-controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 50; /* Above canvas */
+}
+
+.zoom-controls button {
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.zoom-controls button:active {
+    background: #eee;
+    transform: scale(0.95);
 }
 
 /* --- MARKINGS INPUTS --- */
