@@ -1,183 +1,381 @@
 /* --- VARIABLES --- */
 :root {
-    --primary-color: #0056b3;
-    --bg-color: #f4f4f9;
-    --border-color: #ccc;
-    --select-color: #FFD700; 
+    --primary-color: #007AFF; /* iOS Blue */
+    --primary-dark: #005ecb;
+    --bg-color: #F2F2F7;      /* iOS System Gray 6 */
+    --card-bg: #FFFFFF;
+    --text-color: #1C1C1E;
+    --border-color: #E5E5EA;
+    --danger-color: #FF3B30;
+    --nav-height: 60px;
+    --safe-area-bottom: env(safe-area-inset-bottom, 20px);
 }
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     margin: 0;
     background-color: var(--bg-color);
-    color: #333;
+    color: var(--text-color);
+    /* Ensure content doesn't get hidden behind bottom nav */
+    padding-bottom: calc(var(--nav-height) + var(--safe-area-bottom) + 20px);
+    padding-top: 50px; /* Header height */
+    overscroll-behavior-y: none;
 }
 
-/* --- NAVIGATION --- */
-.tab-nav {
-    display: flex;
-    background-color: #333;
-    padding: 10px 20px 0 20px;
-}
-.tab-btn {
-    background-color: #555;
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    cursor: pointer;
-    margin-right: 5px;
-    border-radius: 5px 5px 0 0;
-    font-size: 16px;
-    transition: background 0.3s;
-}
-.tab-btn:hover { background-color: #777; }
-.tab-btn.active {
-    background-color: var(--bg-color);
-    color: #333;
-    border-bottom: 2px solid var(--primary-color);
-    font-weight: bold;
-}
-
-/* --- CONTENT CONTAINERS --- */
-.tab-content {
-    display: none;
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-.tab-content.active { display: block; }
-
-/* --- TOOLBAR --- */
-.toolbar {
-    margin-bottom: 15px;
-    padding: 10px;
-    background: white;
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-}
-button.tool-btn {
-    padding: 8px 12px;
-    border: 1px solid #999;
-    background: #eee;
-    cursor: pointer;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-button.tool-btn.active-tool {
-    background-color: var(--primary-color);
-    color: white;
-    border-color: #003d80;
-}
-button.tool-btn.delete-btn {
-    background-color: #dc3545;
-    color: white;
-    border-color: #b02a37;
-}
-button.tool-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* --- EDIT MODE CANVAS --- */
-#horse-diagram-container {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-    max-width: 100%; 
-    line-height: 0;
-    border: 1px solid #ccc;
-    background-color: white;
-    min-height: 200px;
-}
-#horse-image {
-    display: block;
-    width: 100%;
-    height: auto;
-    pointer-events: none; /* Let clicks pass through to canvas */
-}
-#drawing-canvas {
-    position: absolute;
+/* --- APP HEADER --- */
+.app-header {
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
-    cursor: crosshair;
-    touch-action: none;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
 }
+.app-header h1 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+}
+.badge {
+    font-size: 10px;
+    background: #eee;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 8px;
+    color: #666;
+}
+
+/* --- BOTTOM NAVIGATION --- */
+.tab-nav {
+    display: flex;
+    justify-content: space-around;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: calc(var(--nav-height) + var(--safe-area-bottom));
+    background-color: #ffffff;
+    border-top: 1px solid var(--border-color);
+    z-index: 1000;
+    padding-bottom: var(--safe-area-bottom);
+    box-shadow: 0 -1px 5px rgba(0,0,0,0.05);
+}
+
+.tab-btn {
+    flex: 1;
+    background: transparent;
+    color: #8E8E93;
+    border: none;
+    padding: 8px 0;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    transition: color 0.2s;
+    border-radius: 0;
+    margin: 0;
+}
+
+.tab-btn svg {
+    margin-bottom: 4px;
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+    background-color: transparent;
+    border-bottom: none;
+    font-weight: 500;
+}
+
+/* --- CONTENT CONTAINERS --- */
+.app-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.tab-content {
+    display: none;
+    padding: 16px;
+    animation: fadeIn 0.2s ease-out;
+}
+.tab-content.active { display: block; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- CARDS & TYPOGRAPHY --- */
+.card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.section-title {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 18px;
+    color: #000;
+    font-weight: 700;
+}
+
+.mt-20 { margin-top: 20px; }
 
 /* --- FORMS --- */
 .form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    grid-template-columns: 1fr; /* Stack on mobile */
+    gap: 16px;
 }
-.form-group { margin-bottom: 15px; }
-.form-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9em; }
-.form-group input, .form-group select, .form-group textarea {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-.readonly-field {
-    background-color: #e9ecef;
-    cursor: not-allowed;
+@media(min-width: 600px) {
+    .form-grid { grid-template-columns: 1fr 1fr; }
 }
 
-/* --- PDF PREVIEW --- */
+.form-group { margin-bottom: 0; } /* Grid handles gap */
+.form-group label {
+    display: block;
+    color: #666;
+    font-size: 13px;
+    margin-bottom: 6px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-group input, 
+.form-group select, 
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 16px; /* 16px prevents iOS zoom on focus */
+    background: #fff;
+    -webkit-appearance: none;
+}
+.form-group textarea { resize: vertical; min-height: 60px; }
+
+.readonly-field {
+    background-color: #f0f0f5 !important;
+    color: #666;
+    border-color: transparent !important;
+}
+
+/* --- MARKINGS TAB & TOOLBAR --- */
+.toolbar-sticky-wrapper {
+    position: sticky;
+    top: 50px; /* Below Header */
+    z-index: 100;
+    background: var(--bg-color);
+    padding-bottom: 10px;
+    margin: 0 -16px; /* Bleed to edge */
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+.toolbar {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    padding: 8px 4px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    scrollbar-width: none; /* Hide scrollbar Firefox */
+}
+.toolbar::-webkit-scrollbar { display: none; } /* Hide scrollbar Chrome */
+
+.tool-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.tool-divider {
+    width: 1px;
+    height: 24px;
+    background: #ddd;
+    flex-shrink: 0;
+}
+
+/* Tool Buttons */
+button.tool-btn {
+    height: 44px; /* Minimum touch target */
+    min-width: 44px;
+    padding: 0 12px;
+    border: 1px solid transparent;
+    background: #f2f2f7;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+button.tool-btn.active-tool {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 2px 5px rgba(0,122,255,0.3);
+}
+
+button.tool-btn.icon-only { padding: 0; font-size: 18px; }
+
+button.tool-btn.delete-btn {
+    background-color: #ffe5e5;
+    color: var(--danger-color);
+}
+button.tool-btn.delete-btn:disabled {
+    background-color: #f9f9f9;
+    color: #ccc;
+    opacity: 0.5;
+}
+
+.danger-text { color: var(--danger-color) !important; background: transparent !important; }
+
+/* Tool Indicators */
+.dot-icon { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.5); }
+.dot-icon.black { background: black; }
+.dot-icon.red { background: red; }
+.btn-label { font-size: 13px; }
+
+.helper-text {
+    font-size: 12px;
+    color: #888;
+    text-align: center;
+    margin: 5px 0 0 0;
+}
+
+/* --- CANVAS AREA --- */
+#horse-diagram-container {
+    position: relative;
+    width: 100%;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 10px;
+    /* Remove shadow to focus on drawing */
+}
+
+/* --- MARKINGS INPUTS --- */
+.input-stack .form-group {
+    margin-bottom: 12px;
+}
+
+/* --- APPROVAL --- */
+.approval-box {
+    margin-top: 20px;
+    background: #e6f4ea;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid #c3e6cb;
+}
+.toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    color: #155724;
+}
+input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    margin: 0;
+}
+
+/* --- PREVIEW TAB --- */
+.floating-action-container {
+    position: sticky;
+    top: 60px;
+    z-index: 90;
+    margin-bottom: 20px;
+}
+
+.primary-btn {
+    background: #34C759; /* iOS Green */
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(52, 199, 89, 0.3);
+    transition: transform 0.1s;
+}
+.primary-btn.full-width { width: 100%; }
+.primary-btn:active { transform: scale(0.98); }
+.primary-btn:disabled { background: #ccc; box-shadow: none; }
+
+.pdf-wrapper-scroller {
+    width: 100%;
+    overflow: hidden; /* We will scale instead of scroll */
+    display: flex;
+    justify-content: center;
+    background: #555;
+    padding: 20px 0;
+    border-radius: 8px;
+}
+
 #pdf-preview-container {
     width: 210mm;
     min-height: 297mm;
-    margin: 0 auto;
     background: white;
     padding: 10mm;
-    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
     position: relative;
-    box-sizing: border-box;
+    /* Scale down the PDF preview on mobile so it fits in view */
+    transform-origin: top center;
+    transform: scale(0.43); /* Approximate scale for mobile portrait */
+    margin-bottom: -150mm; /* Compensate for the empty space left by scaling */
 }
+
+@media(min-width: 768px) {
+    #pdf-preview-container { transform: scale(1); margin-bottom: 0; }
+    .pdf-wrapper-scroller { overflow-x: auto; display: block; }
+}
+
+/* PDF Specific Styles (Kept largely same for print consistency, but tidied) */
 #watermark {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 50%; left: 50%;
     transform: translate(-50%, -50%) rotate(-45deg);
     font-size: 150px;
-    color: rgba(255, 0, 0, 0.15);
+    color: rgba(255, 0, 0, 0.1);
     font-weight: bold;
     pointer-events: none;
-    z-index: 999;
+    z-index: 99;
     display: none;
-    border: 5px dashed rgba(255, 0, 0, 0.15);
+    border: 5px dashed rgba(255, 0, 0, 0.1);
     padding: 20px;
 }
-.pdf-section-header {
-    text-align: center;
-    border-bottom: 2px solid #333;
-    margin-bottom: 10px;
-    padding-bottom: 5px;
-}
-.pdf-diagram-area {
-    width: 100%; 
-    border: 1px solid #333;
-    margin-bottom: 10px;
-    background: white;
-    overflow: hidden;
-}
-.pdf-diagram-wrapper {
-    position: relative;
-    width: 100%;      
-    line-height: 0;
-}
+.pdf-section-header { text-align: center; border-bottom: 2px solid #333; margin-bottom: 10px; }
+.pdf-diagram-area { width: 100%; border: 1px solid #333; margin-bottom: 10px; background: white; }
+.pdf-diagram-wrapper { position: relative; width: 100%; line-height: 0; }
 .pdf-diagram-wrapper img { width: 100%; height: auto; display: block; }
 .pdf-diagram-wrapper canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-.pdf-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.pdf-table th, .pdf-table td { border: 1px solid #333; padding: 5px; vertical-align: top; }
-.pdf-table th { background-color: #f0f0f0; width: 15%; }
-.pdf-input-display { font-family: 'Courier New', Courier, monospace; font-weight: bold; text-transform: uppercase; }
+.pdf-table { width: 100%; border-collapse: collapse; font-family: 'Times New Roman', serif; }
+.pdf-table th, .pdf-table td { border: 1px solid #333; padding: 6px; vertical-align: top; font-size: 12px; }
+.pdf-table th { background-color: #f0f0f0; width: 15%; text-align: left; }
+.pdf-input-display { font-family: 'Courier New', monospace; font-weight: bold; text-transform: uppercase; color: #000; }
