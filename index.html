@@ -36,6 +36,10 @@
                         <label>Dam</label>
                         <input type="text" class="readonly-field" value="Ouija Board" readonly>
                     </div>
+                    <div class="form-group" id="ueln-group" style="display: none;">
+                        <label>UELN <span style="font-size: 10px; color: #888; font-weight: normal;">(Universal Equine Life Number)</span></label>
+                        <input type="text" id="input-ueln" class="readonly-field" readonly placeholder="e.g., 372414399999123" maxlength="15">
+                    </div>
                 </div>
             </div>
 
@@ -113,6 +117,97 @@
                     <div class="form-group"><label>Body</label><textarea id="input-body" rows="2"></textarea></div>
                     <div class="form-group"><label>Microchip No.</label><input type="text" id="input-microchip"></div>
                 </div>
+
+                <!-- New Mandatory Form Fields -->
+                <div class="form-group">
+                    <label>Colour *</label>
+                    <select id="input-colour" required>
+                        <option value="">Select colour...</option>
+                        <option value="BAY">Bay</option>
+                        <option value="CHESTNUT">Chestnut</option>
+                        <option value="BLACK">Black</option>
+                        <option value="GREY">Grey</option>
+                        <option value="BROWN">Brown</option>
+                        <option value="ROAN">Roan</option>
+                        <option value="DUN">Dun</option>
+                        <option value="PALOMINO">Palomino</option>
+                        <option value="PIEBALD">Piebald</option>
+                        <option value="SKEWBALD">Skewbald</option>
+                        <option value="CREMELLO">Cremello</option>
+                        <option value="BUCKSKIN">Buckskin</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Sex *</label>
+                    <select id="input-sex" required>
+                        <option value="">Select sex...</option>
+                        <option value="MARE">Mare</option>
+                        <option value="STALLION">Stallion</option>
+                        <option value="GELDING">Gelding</option>
+                        <option value="FILLY">Filly (under 4 years)</option>
+                        <option value="COLT">Colt (under 4 years)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Date of Birth *</label>
+                    <input type="date" id="input-dob" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Species *</label>
+                    <div style="display: flex; gap: 20px; padding-top: 8px;">
+                        <label style="text-transform: none; font-weight: normal; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                            <input type="radio" name="species" value="EQUINE" checked style="width: auto; margin: 0;"> Equine
+                        </label>
+                        <label style="text-transform: none; font-weight: normal; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                            <input type="radio" name="species" value="ASININE" style="width: auto; margin: 0;"> Asinine
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Vet Reference No. * <span style="font-size: 10px; color: #888; font-weight: normal;">(Ireland only)</span></label>
+                    <input type="text" id="input-vet-ref" placeholder="XXX/XXX" pattern="\d{3}/\d{3}" title="Format: XXX/XXX (e.g., 123/456)">
+                </div>
+
+                <div class="form-group">
+                    <label>Location Markings Taken *</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="input-location" placeholder="Enter location or use GPS" style="flex: 1;">
+                        <button type="button" onclick="captureGeolocation()" class="tool-btn" style="min-width: 60px; padding: 0 12px; white-space: nowrap; height: 44px;">
+                            📍 GPS
+                        </button>
+                    </div>
+                    <div id="gps-coords" style="font-size: 11px; color: #888; margin-top: 4px; font-style: italic;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Name and Address of Veterinary Surgeon *</label>
+                    <textarea id="input-vet-address" rows="3" style="text-transform: none;" placeholder="Name, address, and contact details">John Doe, DVM
+123 Veterinary Street
+Dublin, Ireland
+Tel: +353 1 234 5678</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Veterinary Stamp * <span style="font-size: 10px; color: #888; font-weight: normal;">(Image: JPG, PNG, max 5MB)</span></label>
+                    <input type="file" id="input-vet-stamp" accept="image/jpeg,image/png" onchange="previewVetStamp(this)" required>
+                    <div id="stamp-preview" style="margin-top: 10px; max-width: 200px; border: 1px dashed #ccc; border-radius: 8px; padding: 8px; display: none;">
+                        <img id="stamp-img" src="" style="width: 100%; height: auto; display: block;">
+                        <button type="button" onclick="clearVetStamp()" style="margin-top: 8px; padding: 6px 12px; font-size: 12px; background: #f2f2f7; border: 1px solid #ccc; border-radius: 6px; cursor: pointer; width: 100%;">Remove</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Microchip Reader Image <span style="font-size: 10px; color: #888; font-weight: normal;">(Optional - for verification)</span></label>
+                    <input type="file" id="input-microchip-image" accept="image/*" onchange="previewMicrochipImage(this)">
+                    <div id="microchip-image-preview" style="margin-top: 10px; max-width: 200px; display: none;">
+                        <img id="microchip-img" src="" style="width: 100%; height: auto; border: 1px solid #ccc; border-radius: 8px;">
+                        <button type="button" onclick="clearMicrochipImage()" style="margin-top: 8px; padding: 6px 12px; font-size: 12px; background: #f2f2f7; border: 1px solid #ccc; border-radius: 6px; cursor: pointer; width: 100%;">Remove</button>
+                    </div>
+                </div>
             </div>
             
             <div class="approval-box">
@@ -120,6 +215,42 @@
                     <input type="checkbox" id="approve-chk"> 
                     <span class="toggle-text">I hereby Approve this Chart</span>
                 </label>
+            </div>
+
+            <!-- Digital Signature Section (Initially Hidden) -->
+            <div id="signature-section" class="card mt-20" style="display: none; background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%); border: 2px solid #ffc107;">
+                <h3 class="section-title" style="color: #856404; margin-bottom: 12px;">✍️ Digital Signature Required</h3>
+                <p style="font-size: 14px; color: #856404; margin-bottom: 16px; line-height: 1.5;">
+                    By signing below, you confirm that the markings recorded on this chart are accurate and were made during a physical examination of the animal.
+                </p>
+                
+                <div style="background: white; border-radius: 12px; padding: 12px; border: 2px dashed #ffc107;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">Sign Here:</label>
+                    <canvas id="signature-pad" style="
+                        border: 2px solid #333; 
+                        border-radius: 8px; 
+                        width: 100%; 
+                        max-width: 500px; 
+                        height: 150px; 
+                        background: white; 
+                        touch-action: none; 
+                        cursor: crosshair;
+                        display: block;
+                    "></canvas>
+                    
+                    <div style="margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button type="button" onclick="clearSignature()" class="alert-btn alert-btn-secondary" style="flex: 1; min-width: 120px;">
+                            🗑️ Clear
+                        </button>
+                        <button type="button" onclick="acceptSignature()" class="primary-btn" style="flex: 2; min-width: 150px;">
+                            ✅ Accept Signature
+                        </button>
+                    </div>
+                </div>
+                
+                <p style="font-size: 12px; color: #856404; margin-top: 12px; font-style: italic;">
+                    💡 Tip: Use your finger or stylus to sign. Make sure your signature is clear and legible.
+                </p>
             </div>
         </div>
 
@@ -150,15 +281,34 @@
                         <tr>
                             <th>HEAD</th>
                             <td><span class="pdf-input-display" id="disp-head"></span></td>
-                            <th rowspan="8" style="vertical-align: top; background:#fff; width:40%;">
-                                <strong>DETAILS</strong><br><br>
-                                Microchip:  <span class="pdf-input-display" id="disp-microchip"></span><br><br>
-                                Sire:  Galileo<br>
-                                Dam: Ouija Board<br>
-                                Date: <span class="pdf-input-display" id="disp-date"></span><br><br>
-                                <div style="border: 1px solid #333; padding:10px; margin-top:20px;">
-                                    <strong>Vet Signature:</strong><br><br>
-                                    <span style="font-family:'Brush Script MT', cursive; font-size:20px;" id="disp-sig"></span>
+                            <th rowspan="12" style="vertical-align: top; background:#fff; width:42%; padding: 12px;">
+                                <div style="font-size: 11px; line-height: 1.6;">
+                                    <strong style="font-size: 12px;">ANIMAL DETAILS</strong><br>
+                                    <strong>UELN:</strong> <span class="pdf-input-display" id="disp-ueln">N/A</span><br>
+                                    <strong>Colour:</strong> <span class="pdf-input-display" id="disp-colour"></span><br>
+                                    <strong>Sex:</strong> <span class="pdf-input-display" id="disp-sex"></span><br>
+                                    <strong>DOB:</strong> <span class="pdf-input-display" id="disp-dob"></span><br>
+                                    <strong>Species:</strong> <span class="pdf-input-display" id="disp-species"></span><br>
+                                    <strong>Microchip:</strong> <span class="pdf-input-display" id="disp-microchip"></span><br>
+                                    <hr style="margin: 8px 0; border: none; border-top: 1px solid #ccc;">
+                                    <strong style="font-size: 12px;">PARENTAGE</strong><br>
+                                    <strong>Sire:</strong> Galileo<br>
+                                    <strong>Dam:</strong> Ouija Board<br>
+                                    <hr style="margin: 8px 0; border: none; border-top: 1px solid #ccc;">
+                                    <strong style="font-size: 12px;">EXAMINATION</strong><br>
+                                    <strong>Date:</strong> <span class="pdf-input-display" id="disp-date"></span><br>
+                                    <strong>Location:</strong> <span class="pdf-input-display" id="disp-location" style="font-size: 10px;"></span><br>
+                                    <hr style="margin: 8px 0; border: none; border-top: 1px solid #ccc;">
+                                    <strong style="font-size: 12px;">VETERINARY SURGEON</strong><br>
+                                    <span class="pdf-input-display" id="disp-vet-address" style="white-space: pre-wrap; font-size: 10px; text-transform: none;"></span><br>
+                                    <strong>Ref:</strong> <span class="pdf-input-display" id="disp-vet-ref"></span><br>
+                                    <div id="vet-stamp-display" style="max-width: 100px; margin: 8px 0; border: 1px solid #ccc; padding: 4px; border-radius: 4px;"></div>
+                                    <hr style="margin: 8px 0; border: none; border-top: 1px solid #ccc;">
+                                    <div style="border: 2px solid #333; padding: 8px; background: #f9f9f9;">
+                                        <strong style="font-size: 11px;">SIGNATURE</strong><br>
+                                        <img id="disp-sig-image" src="" style="max-width: 100%; height: 50px; display: none; margin: 4px 0;"><br>
+                                        <strong style="font-size: 10px;">Date:</strong> <span id="disp-sig-date" style="font-size: 10px;"></span>
+                                    </div>
                                 </div>
                             </th>
                         </tr>
@@ -168,6 +318,10 @@
                         <tr><th>HINDLEG L</th><td><span class="pdf-input-display" id="disp-lh"></span></td></tr>
                         <tr><th>HINDLEG R</th><td><span class="pdf-input-display" id="disp-rh"></span></td></tr>
                         <tr><th>BODY</th><td><span class="pdf-input-display" id="disp-body"></span></td></tr>
+                        <tr><th>MARKINGS</th><td><span class="pdf-input-display" id="disp-markings">See diagram</span></td></tr>
+                        <tr><th>ACQUIRED MARKS</th><td><span class="pdf-input-display" id="disp-acquired">None</span></td></tr>
+                        <tr><th>WHORLS</th><td><span class="pdf-input-display" id="disp-whorls">See diagram</span></td></tr>
+                        <tr><th>OTHER</th><td><span class="pdf-input-display" id="disp-other">-</span></td></tr>
                         <tr><th>STATUS</th><td><span class="pdf-input-display" id="disp-status"></span></td></tr>
                     </table>
                 </div>

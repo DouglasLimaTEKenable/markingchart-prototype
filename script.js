@@ -603,13 +603,65 @@ function renderPreview() {
         if(el && disp) disp.innerText = el.value || '';
     });
     
+    // Map new fields
+    const colour = document.getElementById('input-colour');
+    if (colour) document.getElementById('disp-colour').innerText = colour.value || '';
+    
+    const sex = document.getElementById('input-sex');
+    if (sex) document.getElementById('disp-sex').innerText = sex.value || '';
+    
+    const dob = document.getElementById('input-dob');
+    if (dob) document.getElementById('disp-dob').innerText = dob.value || '';
+    
+    const species = document.querySelector('input[name="species"]:checked');
+    if (species) document.getElementById('disp-species').innerText = species.value || 'EQUINE';
+    
+    const location = document.getElementById('input-location');
+    if (location) document.getElementById('disp-location').innerText = location.value || '';
+    
+    const vetAddress = document.getElementById('input-vet-address');
+    if (vetAddress) document.getElementById('disp-vet-address').innerText = vetAddress.value || '';
+    
+    const vetRef = document.getElementById('input-vet-ref');
+    if (vetRef) document.getElementById('disp-vet-ref').innerText = vetRef.value || '';
+    
+    const ueln = document.getElementById('input-ueln');
+    if (ueln) document.getElementById('disp-ueln').innerText = ueln.value || 'N/A';
+    
     const dateEl = document.getElementById('exam-date');
     if(dateEl) document.getElementById('disp-date').innerText = dateEl.value;
+
+    // Display vet stamp
+    const vetStampInput = document.getElementById('input-vet-stamp');
+    const vetStampDisplay = document.getElementById('vet-stamp-display');
+    if (vetStampInput && vetStampInput.files && vetStampInput.files[0] && vetStampDisplay) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            vetStampDisplay.innerHTML = '<img src="' + e.target.result + '" style="width: 100%; height: auto;">';
+        };
+        reader.readAsDataURL(vetStampInput.files[0]);
+    } else if (vetStampDisplay) {
+        vetStampDisplay.innerHTML = '';
+    }
+
+    // Display signature
+    const sigImage = document.getElementById('disp-sig-image');
+    const sigDate = document.getElementById('disp-sig-date');
+    if (signatureDataURL && sigImage) {
+        sigImage.src = signatureDataURL;
+        sigImage.style.display = 'block';
+        if (sigDate) {
+            const today = new Date().toLocaleDateString('en-GB');
+            sigDate.innerText = today;
+        }
+    } else if (sigImage) {
+        sigImage.style.display = 'none';
+        if (sigDate) sigDate.innerText = '';
+    }
 
     const isApproved = document.getElementById('approve-chk').checked;
     document.getElementById('disp-status').innerText = isApproved ? 'APPROVED' : 'DRAFT';
     document.getElementById('watermark').style.display = isApproved ?  'none' : 'block';
-    document.getElementById('disp-sig').innerText = isApproved ? "John Doe, DVM" : "";
 }
 
 function generatePDF() {
@@ -695,3 +747,387 @@ function applyPDFZoom() {
         zoomIndicator.textContent = Math.round(pdfScale * 100) + '%';
     }
 }
+
+// --- SIGNATURE CAPTURE ---
+let signatureDataURL = null;
+let signatureCanvas = null;
+let signatureCtx = null;
+let isSignatureDragging = false;
+
+function initSignaturePad() {
+    signatureCanvas = document.getElementById('signature-pad');
+    if (!signatureCanvas) return;
+    
+    signatureCtx = signatureCanvas.getContext('2d');
+    
+    // Set high DPI for better quality
+    const rect = signatureCanvas.getBoundingClientRect();
+    signatureCanvas.width = rect.width * 2;
+    signatureCanvas.height = rect.height * 2;
+    signatureCtx.scale(2, 2);
+    
+    // White background
+    signatureCtx.fillStyle = 'white';
+    signatureCtx.fillRect(0, 0, signatureCanvas.width, signatureCanvas.height);
+    
+    // Drawing state
+    let lastPos = null;
+    
+    function getSignaturePos(e) {
+        const rect = signatureCanvas.getBoundingClientRect();
+        let x, y;
+        if (e.touches && e.touches.length > 0) {
+            x = e.touches[0].clientX - rect.left;
+            y = e.touches[0].clientY - rect.top;
+        } else {
+            x = e.clientX - rect.left;
+            y = e.clientY - rect.top;
+        }
+        return { x, y };
+    }
+    
+    function startSignature(e) {
+        if (e.cancelable) e.preventDefault();
+        isSignatureDragging = true;
+        lastPos = getSignaturePos(e);
+    }
+    
+    function drawSignature(e) {
+        if (!isSignatureDragging) return;
+        if (e.cancelable) e.preventDefault();
+        
+        const pos = getSignaturePos(e);
+        
+        signatureCtx.beginPath();
+        signatureCtx.moveTo(lastPos.x, lastPos.y);
+        signatureCtx.lineTo(pos.x, pos.y);
+        signatureCtx.strokeStyle = '#000';
+        signatureCtx.lineWidth = 2;
+        signatureCtx.lineCap = 'round';
+        signatureCtx.lineJoin = 'round';
+        signatureCtx.stroke();
+        
+        lastPos = pos;
+    }
+    
+    function endSignature(e) {
+        if (e.cancelable) e.preventDefault();
+        isSignatureDragging = false;
+        lastPos = null;
+    }
+    
+    // Mouse events
+    signatureCanvas.addEventListener('mousedown', startSignature);
+    signatureCanvas.addEventListener('mousemove', drawSignature);
+    signatureCanvas.addEventListener('mouseup', endSignature);
+    signatureCanvas.addEventListener('mouseout', endSignature);
+    
+    // Touch events
+    signatureCanvas.addEventListener('touchstart', startSignature);
+    signatureCanvas.addEventListener('touchmove', drawSignature);
+    signatureCanvas.addEventListener('touchend', endSignature);
+    signatureCanvas.addEventListener('touchcancel', endSignature);
+}
+
+function clearSignature() {
+    if (!signatureCanvas || !signatureCtx) return;
+    
+    const rect = signatureCanvas.getBoundingClientRect();
+    signatureCtx.fillStyle = 'white';
+    signatureCtx.fillRect(0, 0, rect.width, rect.height);
+    signatureDataURL = null;
+}
+
+function isSignatureBlank() {
+    if (!signatureCanvas) return true;
+    
+    const pixelData = signatureCtx.getImageData(0, 0, signatureCanvas.width, signatureCanvas.height);
+    const data = pixelData.data;
+    
+    // Check if any pixel is not white
+    for (let i = 0; i < data.length; i += 4) {
+        if (data[i] !== 255 || data[i+1] !== 255 || data[i+2] !== 255) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function acceptSignature() {
+    if (isSignatureBlank()) {
+        showCustomAlert('Please provide a signature before accepting.', 'Signature Required', '✍️');
+        return;
+    }
+    
+    // Capture signature as base64 PNG
+    signatureDataURL = signatureCanvas.toDataURL('image/png');
+    
+    // Hide signature section
+    document.getElementById('signature-section').style.display = 'none';
+    
+    // Show success message
+    showCustomAlert('Signature captured successfully! Switching to Preview tab...', 'Success', '✅');
+    
+    // Switch to Preview tab after short delay
+    setTimeout(() => {
+        closeCustomAlert();
+        switchTab('preview');
+    }, 1500);
+}
+
+// --- FILE UPLOAD FUNCTIONS ---
+function previewVetStamp(input) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    // Validate file type
+    if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
+        showCustomAlert('Please upload a JPG or PNG image file.', 'Invalid File Type', '⚠️');
+        input.value = '';
+        return;
+    }
+    
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+        showCustomAlert('File size must be less than 5MB. Please choose a smaller file.', 'File Too Large', '⚠️');
+        input.value = '';
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('stamp-img').src = e.target.result;
+        document.getElementById('stamp-preview').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+}
+
+function clearVetStamp() {
+    document.getElementById('input-vet-stamp').value = '';
+    document.getElementById('stamp-preview').style.display = 'none';
+    document.getElementById('stamp-img').src = '';
+}
+
+function previewMicrochipImage(input) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+        showCustomAlert('File size must be less than 5MB. Please choose a smaller file.', 'File Too Large', '⚠️');
+        input.value = '';
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('microchip-img').src = e.target.result;
+        document.getElementById('microchip-image-preview').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+}
+
+function clearMicrochipImage() {
+    document.getElementById('input-microchip-image').value = '';
+    document.getElementById('microchip-image-preview').style.display = 'none';
+    document.getElementById('microchip-img').src = '';
+}
+
+// --- GEOLOCATION FUNCTION ---
+function captureGeolocation() {
+    if (!navigator.geolocation) {
+        showCustomAlert('Geolocation is not supported by your browser.', 'Not Supported', '❌');
+        return;
+    }
+    
+    const locationInput = document.getElementById('input-location');
+    const gpsCoords = document.getElementById('gps-coords');
+    
+    // Show loading state
+    const originalValue = locationInput.value;
+    locationInput.value = 'Acquiring GPS location...';
+    locationInput.disabled = true;
+    
+    navigator.geolocation.getCurrentPosition(
+        function(position) {
+            const lat = position.coords.latitude.toFixed(6);
+            const lng = position.coords.longitude.toFixed(6);
+            const accuracy = position.coords.accuracy.toFixed(0);
+            
+            locationInput.value = `${lat}, ${lng}`;
+            locationInput.disabled = false;
+            gpsCoords.textContent = `Coordinates captured with ${accuracy}m accuracy`;
+            
+            showCustomAlert(`GPS location captured successfully!\nLat: ${lat}, Lng: ${lng}\nAccuracy: ${accuracy}m`, 'Location Captured', '📍');
+        },
+        function(error) {
+            locationInput.value = originalValue;
+            locationInput.disabled = false;
+            
+            let errorMsg = 'Unable to retrieve your location.';
+            if (error.code === 1) {
+                errorMsg = 'Location permission denied. Please enable location access in your browser settings.';
+            } else if (error.code === 2) {
+                errorMsg = 'Location information is unavailable.';
+            } else if (error.code === 3) {
+                errorMsg = 'Location request timed out. Please try again.';
+            }
+            
+            showCustomAlert(errorMsg, 'Location Error', '❌');
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        }
+    );
+}
+
+// --- VALIDATION LOGIC ---
+function validateMandatoryFields() {
+    const missingFields = [];
+    
+    // Check canvas has markings
+    if (shapes.length === 0) {
+        missingFields.push('Canvas markings (at least one marking required)');
+    }
+    
+    // Check colour
+    const colour = document.getElementById('input-colour');
+    if (!colour.value) {
+        missingFields.push('Colour');
+        colour.classList.add('validation-error');
+    }
+    
+    // Check sex
+    const sex = document.getElementById('input-sex');
+    if (!sex.value) {
+        missingFields.push('Sex');
+        sex.classList.add('validation-error');
+    }
+    
+    // Check date of birth
+    const dob = document.getElementById('input-dob');
+    if (!dob.value) {
+        missingFields.push('Date of Birth');
+        dob.classList.add('validation-error');
+    }
+    
+    // Check species (should always have one selected by default, but validate anyway)
+    const species = document.querySelector('input[name="species"]:checked');
+    if (!species) {
+        missingFields.push('Species');
+    }
+    
+    // Check vet reference (mandatory for Ireland)
+    const vetRef = document.getElementById('input-vet-ref');
+    if (!vetRef.value) {
+        missingFields.push('Vet Reference No.');
+        vetRef.classList.add('validation-error');
+    } else if (!vetRef.value.match(/^\d{3}\/\d{3}$/)) {
+        missingFields.push('Vet Reference No. (invalid format - use XXX/XXX)');
+        vetRef.classList.add('validation-error');
+    }
+    
+    // Check location
+    const location = document.getElementById('input-location');
+    if (!location.value) {
+        missingFields.push('Location Markings Taken');
+        location.classList.add('validation-error');
+    }
+    
+    // Check vet address
+    const vetAddress = document.getElementById('input-vet-address');
+    if (!vetAddress.value.trim()) {
+        missingFields.push('Veterinary Surgeon Details');
+        vetAddress.classList.add('validation-error');
+    }
+    
+    // Check vet stamp
+    const vetStamp = document.getElementById('input-vet-stamp');
+    if (!vetStamp.files || vetStamp.files.length === 0) {
+        missingFields.push('Veterinary Stamp');
+        vetStamp.classList.add('validation-error');
+    }
+    
+    return missingFields;
+}
+
+function scrollToFirstError() {
+    const firstError = document.querySelector('.validation-error');
+    if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Add shake animation
+        firstError.style.animation = 'shake 0.5s';
+        setTimeout(() => {
+            firstError.style.animation = '';
+        }, 500);
+        
+        // Add pulse animation
+        firstError.style.animation = 'pulse 1s';
+        setTimeout(() => {
+            firstError.style.animation = '';
+        }, 1000);
+    }
+}
+
+// Attach change handler to approval checkbox
+window.addEventListener('load', function() {
+    const approveCheckbox = document.getElementById('approve-chk');
+    if (approveCheckbox) {
+        approveCheckbox.addEventListener('change', function() {
+            // Clear any existing validation errors
+            document.querySelectorAll('.validation-error').forEach(el => {
+                el.classList.remove('validation-error');
+            });
+            
+            if (this.checked) {
+                // Validate all mandatory fields
+                const missingFields = validateMandatoryFields();
+                
+                if (missingFields.length > 0) {
+                    // Prevent checking
+                    this.checked = false;
+                    
+                    // Show error message
+                    let message = 'Please complete the following required fields:\n\n';
+                    message += missingFields.map(f => '• ' + f).join('\n');
+                    
+                    showCustomAlert(message, 'Missing Required Fields', '⚠️');
+                    
+                    // Scroll to first error
+                    scrollToFirstError();
+                } else {
+                    // All validation passed, show signature pad
+                    document.getElementById('signature-section').style.display = 'block';
+                    
+                    // Initialize signature pad if not already done
+                    if (!signatureCanvas) {
+                        initSignaturePad();
+                    } else {
+                        // Clear existing signature
+                        clearSignature();
+                    }
+                    
+                    // Scroll to signature section
+                    document.getElementById('signature-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            } else {
+                // Hide signature section and clear signature
+                document.getElementById('signature-section').style.display = 'none';
+                if (signatureCanvas) {
+                    clearSignature();
+                }
+                signatureDataURL = null;
+            }
+        });
+    }
+    
+    // Clear validation error on focus
+    document.addEventListener('focus', function(e) {
+        if (e.target.classList.contains('validation-error')) {
+            e.target.classList.remove('validation-error');
+        }
+    }, true);
+});

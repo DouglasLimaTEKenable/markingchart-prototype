@@ -755,3 +755,66 @@ input[type="checkbox"] {
 .alert-btn-danger:active {
     background: #cc2e24;
 }
+
+/* Style for the new form layout */
+.input-stack {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+@media(min-width: 600px) {
+    .input-stack {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Ensure file inputs have consistent padding */
+input[type="file"] {
+    padding: 8px !important;
+    font-size: 14px !important;
+}
+
+/* Force uppercase on marking description fields */
+#input-head,
+#input-neck,
+#input-lf,
+#input-rf,
+#input-lh,
+#input-rh,
+#input-body,
+#input-microchip,
+#input-location {
+    text-transform: uppercase;
+}
+
+/* Keep vet address in normal case for readability */
+#input-vet-address {
+    text-transform: none;
+}
+
+/* Validation error states */
+.validation-error {
+    border: 2px solid var(--danger-color) !important;
+}
+
+/* Shake animation for validation errors */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* Pulse animation for scroll-to field */
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.7); }
+    50% { box-shadow: 0 0 0 10px rgba(255, 59, 48, 0); }
+}
+
+/* Clear error state on focus */
+input.validation-error:focus,
+select.validation-error:focus,
+textarea.validation-error:focus {
+    border: 2px solid var(--primary-color) !important;
+    animation: none;
+}
