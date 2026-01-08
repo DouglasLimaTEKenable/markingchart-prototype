@@ -533,14 +533,6 @@ function undoLast() {
     }
 }
 
-function clearAll() {
-    if(confirm("Clear the entire chart?")) {
-        shapes = [];
-        selectedShapeIndex = -1;
-        redrawCanvas();
-    }
-}
-
 // --- EVENT LISTENERS ---
 canvas.addEventListener('mousedown', startAction);
 canvas.addEventListener('mousemove', moveAction);
