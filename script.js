@@ -618,47 +618,54 @@ function generatePDF() {
     const btn = document.getElementById('btn-download');
     const txt = btn.innerText;
     
-    // Temporarily reset scale for PDF generation
+    // Temporarily reset scale and remove box-shadow for PDF generation
     const currentScale = pdfScale;
+    const currentShadow = element.style. boxShadow;
     element.style.transform = 'scale(1)';
+    element.style.boxShadow = 'none';
     
-    btn.innerText = "Generating... ";
+    btn.innerText = "Generating...";
     btn.disabled = true;
 
-    const opt = {
-        margin: 10, // Single value for all sides
-        filename: 'MarkingChart. pdf',
-        image:  { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-            scale: 2,
-            useCORS: true,
-            logging: false,
-            windowWidth: element.offsetWidth,
-            windowHeight: element.offsetHeight
-        },
-        jsPDF: { 
-            unit: 'mm', 
-            format: 'a4',
-            orientation: 'portrait',
-            compress: true
-        },
-        pagebreak: { 
-            mode: 'avoid-all'
-        }
-    };
+    // Use a timeout to ensure DOM is settled
+    setTimeout(() => {
+        const opt = {
+            margin:  0,
+            filename: 'MarkingChart.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { 
+                scale: 2,
+                useCORS: true,
+                logging: true,
+                letterRendering: true,
+                allowTaint: false,
+                backgroundColor: '#ffffff'
+            },
+            jsPDF: { 
+                unit: 'mm', 
+                format: 'a4',
+                orientation: 'portrait'
+            },
+            pagebreak:  { 
+                mode: 'avoid-all'
+            }
+        };
 
-    html2pdf().set(opt).from(element).save()
-    .then(() => { 
-        btn.innerText = txt; 
-        btn.disabled = false;
-        element.style.transform = `scale(${currentScale})`;
-    })
-    .catch(e => { 
-        alert(e.message); 
-        btn.innerText = txt; 
-        btn.disabled = false;
-        element.style.transform = `scale(${currentScale})`;
-    });
+        html2pdf().set(opt).from(element).save()
+        .then(() => { 
+            btn.innerText = txt; 
+            btn.disabled = false;
+            element.style.transform = `scale(${currentScale})`;
+            element.style.boxShadow = currentShadow;
+        })
+        .catch(e => { 
+            alert(e.message); 
+            btn.innerText = txt; 
+            btn.disabled = false;
+            element.style.transform = `scale(${currentScale})`;
+            element.style.boxShadow = currentShadow;
+        });
+    }, 100);
 }
 
 // PDF zoom functions
