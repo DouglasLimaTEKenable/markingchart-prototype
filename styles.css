@@ -545,7 +545,7 @@ input[type="checkbox"] {
     animation: fadeIn 0.2s ease-out;
 }
 
-. alert-overlay.active {
+.alert-overlay.active {
     display: flex;
 }
 
