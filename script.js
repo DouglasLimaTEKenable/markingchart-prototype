@@ -623,26 +623,35 @@ function generatePDF() {
     element.style.transform = 'scale(1)';
     
     btn.innerText = "Generating...";
-    btn.disabled = true;
+    btn. disabled = true;
 
     const opt = {
-        margin: 10,
+        margin: 5, // Reduced from 10 to prevent cutting
         filename: 'MarkingChart.pdf',
         image: { type: 'jpeg', quality: 0.95 },
-        html2canvas:  { 
-            scale: 1.5, // Reduced from 2
+        html2canvas: { 
+            scale: 2, // Increased back to 2 for better quality
             useCORS: true,
             logging: false,
-            height: element.offsetHeight, // Use actual height
-            windowHeight: element.offsetHeight
+            scrollY: 0,
+            scrollX: 0,
+            width: element.scrollWidth, // Use scroll width for full content
+            height: element.scrollHeight, // Use scroll height for full content
+            windowWidth: element.scrollWidth,
+            windowHeight: element.scrollHeight,
+            x: 0,
+            y:  0
         },
         jsPDF: { 
-            unit:  'mm', 
+            unit: 'mm', 
             format: 'a4',
             orientation: 'portrait',
             compress: true
         },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        pagebreak: { 
+            mode: ['avoid-all', 'css', 'legacy'],
+            after: '. avoid-break'
+        }
     };
 
     html2pdf().set(opt).from(element).save()

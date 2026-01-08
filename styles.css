@@ -530,14 +530,15 @@ input[type="checkbox"] {
     min-height: auto; /* Changed from 297mm */
     max-height: 297mm; /* Add max height constraint */
     background:  white;
-    padding: 10mm;
+    padding: 8mm; /* Reduced from 10mm to fit better */
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
     position: relative;
     transform-origin: top center;
     transition: transform 0.2s ease-out;
     transform: scale(1);
     margin-bottom: 0;
-    overflow:  hidden; /* Prevent content overflow */
+    overflow: hidden; /* Prevent content overflow */
+    box-sizing: border-box; /* Include padding in width calculation */
 }
 
 /* Remove the media query that was forcing scale */
