@@ -520,9 +520,16 @@ function generatePDF() {
 
 // custom alert functions
 function showCustomAlert(message, title = 'Notice') {
-    const overlay = document. getElementById('custom-alert-overlay');
+    const overlay = document.getElementById('custom-alert-overlay');
     const titleEl = document.getElementById('alert-title');
     const messageEl = document.getElementById('alert-message');
+    
+    // Check if elements exist
+    if (!overlay || !titleEl || !messageEl) {
+        console.error('Alert elements not found');
+        alert(message); // Fallback to browser alert
+        return;
+    }
     
     titleEl.textContent = title;
     messageEl.textContent = message;
@@ -534,14 +541,16 @@ function showCustomAlert(message, title = 'Notice') {
 
 function closeCustomAlert() {
     const overlay = document.getElementById('custom-alert-overlay');
-    overlay.classList.remove('active');
+    if (overlay) {
+        overlay.classList.remove('active');
+    }
     
     // Restore body scroll
     document.body.style.overflow = '';
 }
 
-// Close modal when clicking outside of it
-document.addEventListener('DOMContentLoaded', function() {
+// Initialize modal click handler - use a simpler approach
+window.addEventListener('load', function() {
     const overlay = document.getElementById('custom-alert-overlay');
     if (overlay) {
         overlay.addEventListener('click', function(e) {
@@ -552,13 +561,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Modify the startAction function - replace the alert line
+// FIND and REPLACE the existing startAction function with this complete version:
 function startAction(e) {
     if (e.cancelable) e.preventDefault();
     
     // Get raw screen coords for drag delta calculations
     let cx, cy;
-    if (e.changedTouches && e.changedTouches. length > 0) {
+    if (e.changedTouches && e.changedTouches.length > 0) {
         cx = e.changedTouches[0].clientX;
         cy = e.changedTouches[0].clientY;
     } else {
@@ -598,7 +607,7 @@ function startAction(e) {
         }
         
         shapes.push({
-            type: 'symbol', text: type, x: pos. x, y: pos.y, color: color
+            type: 'symbol', text: type, x: pos.x, y: pos.y, color: color
         });
         isDragging = false; 
         redrawCanvas();

@@ -11,7 +11,7 @@
 
     <header class="app-header">
         <h1>Vet Markings</h1>
-        <span class="badge">v2.4</span>
+        <span class="badge">v2.5</span>
     </header>
 
     <main class="app-content">
@@ -167,6 +167,16 @@
         </div>
     
     </main>
+	
+	<!-- Custom Alert Modal -->
+    <div id="custom-alert-overlay" class="alert-overlay">
+        <div class="alert-modal">
+            <div class="alert-icon">⚠️</div>
+            <h3 class="alert-title" id="alert-title">Alert</h3>
+            <p class="alert-message" id="alert-message"></p>
+            <button class="alert-btn" onclick="closeCustomAlert()">OK</button>
+        </div>
+    </div>
 
     <nav class="tab-nav">
         <button class="tab-btn active" onclick="switchTab('request')">
