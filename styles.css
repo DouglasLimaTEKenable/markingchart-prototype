@@ -526,19 +526,19 @@ input[type="checkbox"] {
 }
 
 #pdf-preview-container {
-    width: 210mm;
-    min-height: auto; /* Changed from 297mm */
-    max-height: 297mm; /* Add max height constraint */
+    width: 190mm; /* Reduced from 210mm to account for padding */
+    min-height: auto;
+    max-height: 277mm; /* Reduced from 297mm to account for padding */
     background:  white;
-    padding: 8mm; /* Reduced from 10mm to fit better */
+    padding: 10mm;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
     position: relative;
     transform-origin: top center;
     transition: transform 0.2s ease-out;
     transform: scale(1);
-    margin-bottom: 0;
-    overflow: hidden; /* Prevent content overflow */
-    box-sizing: border-box; /* Include padding in width calculation */
+    margin: 0 auto; /* Center the container */
+    overflow: hidden;
+    box-sizing: content-box; /* Changed from border-box */
 }
 
 /* Remove the media query that was forcing scale */
