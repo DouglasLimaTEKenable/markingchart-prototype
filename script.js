@@ -1058,17 +1058,16 @@ function scrollToFirstError() {
     if (firstError) {
         firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
         
-        // Add shake animation
+        // Add shake animation first
         firstError.style.animation = 'shake 0.5s';
-        setTimeout(() => {
-            firstError.style.animation = '';
-        }, 500);
         
-        // Add pulse animation
-        firstError.style.animation = 'pulse 1s';
+        // After shake completes, add pulse animation
         setTimeout(() => {
-            firstError.style.animation = '';
-        }, 1000);
+            firstError.style.animation = 'pulse 1s';
+            setTimeout(() => {
+                firstError.style.animation = '';
+            }, 1000);
+        }, 500);
     }
 }
 
