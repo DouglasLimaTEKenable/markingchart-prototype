@@ -235,14 +235,14 @@ function showCustomAlert(message, title = 'Notice', icon = '⚠️') {
     overlay.classList.add('active');
     
     // Prevent body scroll when modal is open
-    document.body. style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
 }
 
 function showCustomConfirm(message, title = 'Confirm', icon = '❓', onConfirm) {
     const overlay = document.getElementById('custom-alert-overlay');
     const titleEl = document.getElementById('alert-title');
     const messageEl = document.getElementById('alert-message');
-    const iconEl = document. getElementById('alert-icon');
+    const iconEl = document.getElementById('alert-icon');
     const alertButtons = document.getElementById('alert-buttons');
     const confirmButtons = document.getElementById('confirm-buttons');
     
@@ -260,7 +260,7 @@ function showCustomConfirm(message, title = 'Confirm', icon = '❓', onConfirm) 
     
     // Show confirm mode (Cancel + Action buttons)
     alertButtons.style.display = 'none';
-    confirmButtons.style. display = 'flex';
+    confirmButtons.style.display = 'flex';
     
     // Store callback
     confirmCallback = onConfirm;
@@ -268,7 +268,7 @@ function showCustomConfirm(message, title = 'Confirm', icon = '❓', onConfirm) 
     overlay.classList.add('active');
     
     // Prevent body scroll when modal is open
-    document. body.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
 }
 
 function closeCustomAlert() {
