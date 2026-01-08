@@ -367,18 +367,18 @@ button.tool-btn.delete-btn:disabled {
     top: auto; /* Override any previous top positioning */
     left: auto; /* Override any previous left positioning */
     
-    display: flex;
-    flex-direction: column;
+    display:  flex;
+    flex-direction:  column;
     gap: 10px;
     
-    /* Fix: Increase z-index to ensure visibility above all elements */
-    z-index:  1000;
+    /* Fix: Keep z-index below the sticky toolbar (100) but above canvas content */
+    z-index: 50;
     
-    /* Fix: Add semi-transparent background for better visibility */
+    /* Fix:  Add semi-transparent background for better visibility */
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(8px);
     padding: 8px;
-    border-radius:  12px;
+    border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
@@ -402,8 +402,8 @@ button.tool-btn.delete-btn:disabled {
 }
 
 .zoom-controls button:active {
-    background: #eee;
-    transform: scale(0.95);
+    background:  #eee;
+    transform:  scale(0.95);
 }
 
 .zoom-controls button:hover {
