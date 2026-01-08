@@ -614,7 +614,7 @@ function renderPreview() {
 
 function generatePDF() {
     if (typeof html2pdf === 'undefined') return alert('PDF Lib missing');
-    const element = document. getElementById('pdf-preview-container');
+    const element = document.getElementById('pdf-preview-container');
     const btn = document.getElementById('btn-download');
     const txt = btn.innerText;
     
@@ -622,31 +622,27 @@ function generatePDF() {
     const currentScale = pdfScale;
     element.style.transform = 'scale(1)';
     
-    btn.innerText = "Generating...";
+    btn.innerText = "Generating... ";
     btn.disabled = true;
 
     const opt = {
-        margin: [5, 5, 5, 5], // [top, left, bottom, right] in mm
-        filename: 'MarkingChart.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { 
+        margin: 10, // Single value for all sides
+        filename: 'MarkingChart. pdf',
+        image:  { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
             scale: 2,
             useCORS: true,
             logging: false,
-            scrollY: -window.scrollY,
-            scrollX: -window. scrollX,
-            windowWidth: 794, // A4 width in pixels at 96 DPI (210mm)
-            windowHeight: 1123, // A4 height in pixels at 96 DPI (297mm)
-            width: element.offsetWidth,
-            height: element.offsetHeight
+            windowWidth: element.offsetWidth,
+            windowHeight: element.offsetHeight
         },
-        jsPDF:  { 
+        jsPDF: { 
             unit: 'mm', 
-            format: [210, 297], // Explicit A4 dimensions
+            format: 'a4',
             orientation: 'portrait',
             compress: true
         },
-        pagebreak:  { 
+        pagebreak: { 
             mode: 'avoid-all'
         }
     };
