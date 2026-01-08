@@ -581,7 +581,7 @@ function renderPreview() {
     // 4. Create a Preview Canvas overlay
     const pCanvas = document.createElement('canvas');
     pCanvas.width = canvas.width;
-    pCanvas. height = canvas.height;
+    pCanvas.height = canvas.height;
     
     const pCtx = pCanvas.getContext('2d');
     pCtx.drawImage(canvas, 0, 0);
@@ -590,7 +590,7 @@ function renderPreview() {
     pCanvas.style.top = '0';
     pCanvas.style.left = '0';
     pCanvas.style.width = '100%';
-    pCanvas. style.height = '100%';
+    pCanvas.style.height = '100%';
 
     wrapper.appendChild(pCanvas);
     container.appendChild(wrapper);
@@ -614,7 +614,7 @@ function renderPreview() {
     if (dob) document.getElementById('disp-dob').innerText = dob.value || '';
     
     // FIX: Remove extra space in selector
-    const species = document. querySelector('input[name="species"]:checked');
+    const species = document.querySelector('input[name="species"]:checked');
     if (species) document.getElementById('disp-species').innerText = species.value || 'EQUINE';
     
     const location = document.getElementById('input-location');
@@ -638,9 +638,9 @@ function renderPreview() {
     if (vetStampInput && vetStampInput.files && vetStampInput.files[0] && vetStampDisplay) {
         const reader = new FileReader();
         reader.onload = function(e) {
-            vetStampDisplay. innerHTML = '<img src="' + e.target. result + '" style="width:  100%; height: auto;">';
+            vetStampDisplayinnerHTML = '<img src="' + e.target.result + '" style="width:  100%; height: auto;">';
         };
-        reader. readAsDataURL(vetStampInput.files[0]);
+        reader.readAsDataURL(vetStampInput.files[0]);
     } else if (vetStampDisplay) {
         vetStampDisplay.innerHTML = '';
     }
@@ -650,7 +650,7 @@ function renderPreview() {
     const sigDate = document.getElementById('disp-sig-date');
     if (signatureDataURL && sigImage) {
         sigImage.src = signatureDataURL;
-        sigImage.style. display = 'block';
+        sigImage.style.display = 'block';
         if (sigDate) {
             const today = new Date().toLocaleDateString('en-GB');
             sigDate.innerText = today;
@@ -673,7 +673,7 @@ function generatePDF() {
     
     // Temporarily reset scale and remove box-shadow for PDF generation
     const currentScale = pdfScale;
-    const currentShadow = element.style. boxShadow;
+    const currentShadow = element.style.boxShadow;
     element.style.transform = 'scale(1)';
     element.style.boxShadow = 'none';
     
@@ -1006,8 +1006,8 @@ function validateMandatoryFields() {
     ];
     
     markingFields.forEach(field => {
-        const el = document.getElementById(field. id);
-        if (!el || !el.value. trim()) {
+        const el = document.getElementById(field.id);
+        if (!el || !el.value.trim()) {
             missingFields.push(field.label);
             if (el) el.classList.add('validation-error');
         }
@@ -1069,9 +1069,9 @@ function validateMandatoryFields() {
     }
 
     const microchip = document.getElementById('input-microchip');
-    if (!microchip. value. trim()) {
-        missingFields. push('Microchip No.');
-        microchip.classList. add('validation-error');
+    if (!microchip.value.trim()) {
+        missingFields.push('Microchip No.');
+        microchip.classList.add('validation-error');
     }
     
     // Check vet stamp
@@ -1160,8 +1160,8 @@ window.addEventListener('load', function() {
                     );
                     // If user cancels, re-check the box
                     setTimeout(() => {
-                        if (! signatureDataURL) { // User confirmed
-                            approveCheckbox. checked = false;
+                        if (!signatureDataURL) { // User confirmed
+                            approveCheckbox.checked = false;
                         } else {
                             approveCheckbox.checked = true;
                         }
