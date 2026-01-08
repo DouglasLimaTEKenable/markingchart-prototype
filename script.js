@@ -34,7 +34,7 @@ function switchTab(tabId) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelector(`button[onclick="switchTab('${tabId}')"]`).classList.add('active');
     
-    document.querySelectorAll('.tab-content').forEach(c => c.classList. remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     document.getElementById(`tab-${tabId}`).classList.add('active');
 
     // Important: When switching back to markings, ensure it fits correctly again
@@ -63,7 +63,7 @@ function initImage() {
     };
     img.onerror = () => {
         horseImage.style.background = "#eee";
-        horseImage. alt = "Image not found (Section1.png)";
+        horseImage.alt = "Image not found (Section1.png)";
         wrapper.style.width = "800px"; wrapper.style.height = "600px";
     }
 }
@@ -76,7 +76,7 @@ function resizeCanvas() {
         canvas.width = w;
         canvas.height = h;
         wrapper.style.width = w + "px";
-        wrapper.style. height = h + "px";
+        wrapper.style.height = h + "px";
         redrawCanvas(); 
     }
 }
@@ -120,7 +120,7 @@ function resetZoom() {
     const scaleY = containerH / imageH;
 
     // 2. Use the smaller ratio to ensure the whole image fits ("contain")
-    // Optional: Math.min(scaleX, scaleY, 1) if you never want it to upscale initially.  
+    // Optional: Math.min(scaleX, scaleY, 1) if you never want it to upscale initially.
     scale = Math.min(scaleX, scaleY);
 
     // 3. Calculate centering offsets
@@ -160,15 +160,15 @@ function setTool(tool) {
 
     if (tool === 'view-pan') {
         canvas.style.cursor = "grab";
-        if(helperText) helperText.innerText = "Click and drag to Pan the view. ";
+        if(helperText) helperText.innerText = "Click and drag to Pan the view.";
     } else if (tool === 'select') {
         canvas.style.cursor = "default";
         document.getElementById('btn-delete').disabled = true;
-        if(helperText) helperText.innerText = "Click to Select marks.  Drag to move. ";
+        if(helperText) helperText.innerText = "Click to Select marks. Drag to move.";
     } else {
         canvas.style.cursor = "crosshair";
         document.getElementById('btn-delete').disabled = true;
-        if(helperText) helperText.innerText = "Draw on the chart. ";
+        if(helperText) helperText.innerText = "Draw on the chart.";
     }
     
     document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active-tool'));
@@ -181,7 +181,7 @@ function setTool(tool) {
 // --- COORDINATE MAPPING ---
 function getPos(e) {
     let cx, cy;
-    if (e.changedTouches && e.changedTouches. length > 0) {
+    if (e.changedTouches && e.changedTouches.length > 0) {
         cx = e.changedTouches[0].clientX;
         cy = e.changedTouches[0].clientY;
     } else {
@@ -202,7 +202,7 @@ function getPos(e) {
 
 // --- HELPER FUNCTIONS ---
 function countMSymbols() {
-    return shapes.filter(s => s. type === 'symbol' && s.text === 'M').length;
+    return shapes.filter(s => s.type === 'symbol' && s.text === 'M').length;
 }
 
 // Custom alert functions
@@ -223,17 +223,17 @@ function showCustomAlert(message, title = 'Notice') {
     overlay.classList.add('active');
     
     // Prevent body scroll when modal is open
-    document.body. style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
 }
 
 function closeCustomAlert() {
     const overlay = document.getElementById('custom-alert-overlay');
     if (overlay) {
-        overlay.classList. remove('active');
+        overlay.classList.remove('active');
     }
     
     // Restore body scroll
-    document. body.style.overflow = '';
+    document.body.style.overflow = '';
 }
 
 // Initialize modal click handler
@@ -254,7 +254,7 @@ function startAction(e) {
     
     // Get raw screen coords for drag delta calculations
     let cx, cy;
-    if (e. changedTouches && e. changedTouches.length > 0) {
+    if (e.changedTouches && e.changedTouches.length > 0) {
         cx = e.changedTouches[0].clientX;
         cy = e.changedTouches[0].clientY;
     } else {
@@ -281,7 +281,7 @@ function startAction(e) {
         selectedShapeIndex = foundIndex;
         document.getElementById('btn-delete').disabled = (selectedShapeIndex === -1);
         redrawCanvas();
-    } else if (currentTool. startsWith('symbol')) {
+    } else if (currentTool.startsWith('symbol')) {
         const type = currentTool === 'symbol-m' ? 'M' : 'X';
         const color = currentTool === 'symbol-m' ? 'red' : 'black';
         
@@ -367,10 +367,10 @@ function endAction(e) {
         return;
     }
 
-    if (currentTool. endsWith('pen') && currentPathPoints.length > 1) {
+    if (currentTool.endsWith('pen') && currentPathPoints.length > 1) {
         shapes.push({
             type: 'path',
-            points: [... currentPathPoints],
+            points: [...currentPathPoints],
             color:  (currentTool === 'red-pen') ? 'red' : 'black'
         });
     }
@@ -411,7 +411,7 @@ function redrawCanvas() {
             if(s.points.length < 2) return;
             ctx.beginPath();
             ctx.moveTo(s.points[0].x, s.points[0].y);
-            for(let i=1; i<s.points. length; i++) {
+            for(let i=1; i<s.points.length; i++) {
                 ctx.lineTo(s.points[i].x, s.points[i].y);
             }
             ctx.lineCap = 'round';
@@ -421,7 +421,7 @@ function redrawCanvas() {
         } else if (s.type === 'symbol') {
             ctx.font = isSelected ? 'bold 28px Arial' : 'bold 24px Arial';
             ctx.fillStyle = s.color;
-            ctx.fillText(s.text, s. x - 8, s.y + 8);
+            ctx.fillText(s.text, s.x - 8, s.y + 8);
         }
         
         ctx.shadowBlur = 0; 
@@ -432,13 +432,13 @@ function redrawCanvas() {
         ctx.beginPath();
         ctx.moveTo(currentPathPoints[0].x, currentPathPoints[0].y);
         for(let i=1; i<currentPathPoints.length; i++) {
-            ctx.lineTo(currentPathPoints[i]. x, currentPathPoints[i]. y);
+            ctx.lineTo(currentPathPoints[i].x, currentPathPoints[i].y);
         }
         ctx.lineCap = 'round';
         ctx.lineWidth = 3;
         // Determine color based on active tool
         ctx.strokeStyle = (currentTool === 'red-pen') ? 'red' : 'black';
-        ctx. stroke();
+        ctx.stroke();
     }
 }
 
@@ -500,12 +500,12 @@ function renderPreview() {
     imgClone.style.transform = 'none';
     imgClone.style.maxWidth = 'none';   
     imgClone.style.maxHeight = 'none';
-    wrapper. appendChild(imgClone);
+    wrapper.appendChild(imgClone);
 
     // 4. Create a Preview Canvas overlay
     const pCanvas = document.createElement('canvas');
     pCanvas.width = canvas.width;
-    pCanvas. height = canvas.height;
+    pCanvas.height = canvas.height;
     
     const pCtx = pCanvas.getContext('2d');
     pCtx.drawImage(canvas, 0, 0);
@@ -542,16 +542,16 @@ function generatePDF() {
     const btn = document.getElementById('btn-download');
     const txt = btn.innerText;
     
-    btn.innerText = "Generating... ";
+    btn.innerText = "Generating...";
     btn.disabled = true;
 
     html2pdf().set({
         margin: 0,
-        filename: 'MarkingChart. pdf',
+        filename: 'MarkingChart.pdf',
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true },
         jsPDF: { unit: 'mm', format: 'a4' }
     }).from(element).save()
-    .then(() => { btn.innerText = txt; btn. disabled = false; })
-    .catch(e => { alert(e.message); btn.innerText = txt; btn. disabled = false; });
+    .then(() => { btn.innerText = txt; btn.disabled = false; })
+    .catch(e => { alert(e.message); btn.innerText = txt; btn.disabled = false; });
 }
