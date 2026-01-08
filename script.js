@@ -618,18 +618,44 @@ function generatePDF() {
     const btn = document.getElementById('btn-download');
     const txt = btn.innerText;
     
-    btn.innerText = "Generating...";
+    // Temporarily reset scale for PDF generation
+    const currentScale = pdfScale;
+    element.style.transform = 'scale(1)';
+    
+    btn.innerText = "Generating... ";
     btn.disabled = true;
 
     html2pdf().set({
-        margin: 0,
-        filename: 'MarkingChart.pdf',
+        margin: [10, 10, 10, 10], // Changed from 0 to add margins
+        filename: 'MarkingChart. pdf',
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4' }
+        html2canvas: { 
+            scale: 2, 
+            useCORS: true,
+            logging: false,
+            windowWidth: element.scrollWidth,
+            windowHeight: element.scrollHeight
+        },
+        jsPDF: { 
+            unit: 'mm', 
+            format: 'a4',
+            orientation: 'portrait'
+        },
+        pagebreak: { mode: 'avoid-all' } // Prevent page breaks
     }).from(element).save()
-    .then(() => { btn.innerText = txt; btn.disabled = false; })
-    .catch(e => { alert(e.message); btn.innerText = txt; btn.disabled = false; });
+    .then(() => { 
+        btn.innerText = txt; 
+        btn.disabled = false;
+        // Restore scale
+        element.style.transform = `scale(${currentScale})`;
+    })
+    .catch(e => { 
+        alert(e.message); 
+        btn.innerText = txt; 
+        btn.disabled = false;
+        // Restore scale
+        element.style.transform = `scale(${currentScale})`;
+    });
 }
 
 // PDF zoom functions

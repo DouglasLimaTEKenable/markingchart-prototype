@@ -527,16 +527,17 @@ input[type="checkbox"] {
 
 #pdf-preview-container {
     width: 210mm;
-    min-height: 297mm;
-    background: white;
+    min-height: auto; /* Changed from 297mm */
+    max-height: 297mm; /* Add max height constraint */
+    background:  white;
     padding: 10mm;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
     position: relative;
     transform-origin: top center;
     transition: transform 0.2s ease-out;
-    /* Remove fixed scaling on mobile */
     transform: scale(1);
     margin-bottom: 0;
+    overflow:  hidden; /* Prevent content overflow */
 }
 
 /* Remove the media query that was forcing scale */
