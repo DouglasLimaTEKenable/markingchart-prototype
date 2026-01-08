@@ -42,10 +42,11 @@ function switchTab(tabId) {
          setTimeout(() => {
              resizeCanvas();
              resetZoom();
+             // Set Pan as default tool when entering Markings tab
+             setTool('view-pan');
          }, 50);
     }
 }
-
 
 function initImage() {
     const imgPath = 'Section1.png'; 
@@ -97,6 +98,9 @@ function updateZoom(delta) {
     scale = newScale;
     clampPan();
     applyTransform();
+    
+    // Auto-activate Pan tool after zooming
+    autoActivatePan();
 }
 
 // --- REWRITTEN RESETZOOM TO "FIT" IMAGE ---
@@ -116,7 +120,7 @@ function resetZoom() {
     const scaleY = containerH / imageH;
 
     // 2. Use the smaller ratio to ensure the whole image fits ("contain")
-    // Optional: Math.min(scaleX, scaleY, 1) if you never want it to upscale initially.
+    // Optional: Math.min(scaleX, scaleY, 1) if you never want it to upscale initially. 
     scale = Math.min(scaleX, scaleY);
 
     // 3. Calculate centering offsets
@@ -128,6 +132,9 @@ function resetZoom() {
     // Ensure smooth transition for the reset action
     wrapper.style.transition = "transform 0.3s ease-out";
     applyTransform();
+    
+    // Auto-activate Pan tool after reset
+    autoActivatePan();
 }
 
 function applyTransform() {
@@ -371,6 +378,12 @@ function redrawCanvas() {
         // Determine color based on active tool
         ctx.strokeStyle = (currentTool === 'red-pen') ? 'red' : 'black';
         ctx.stroke();
+    }
+}
+
+function autoActivatePan() {
+    if (currentTool !== 'view-pan') {
+        setTool('view-pan');
     }
 }
 
