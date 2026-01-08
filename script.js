@@ -201,7 +201,7 @@ function startAction(e) {
     
     // Get raw screen coords for drag delta calculations
     let cx, cy;
-    if (e.changedTouches && e.changedTouches.length > 0) {
+    if (e.changedTouches && e.changedTouches. length > 0) {
         cx = e.changedTouches[0].clientX;
         cy = e.changedTouches[0].clientY;
     } else {
@@ -210,7 +210,7 @@ function startAction(e) {
     }
 
     isDragging = true;
-    dragStartPos = { x: cx, y: cy }; 
+    dragStartPos = { x: cx, y:  cy }; 
 
     // --- PANNING LOGIC ---
     if (currentTool === 'view-pan') {
@@ -228,9 +228,17 @@ function startAction(e) {
         selectedShapeIndex = foundIndex;
         document.getElementById('btn-delete').disabled = (selectedShapeIndex === -1);
         redrawCanvas();
-    } else if (currentTool.startsWith('symbol')) {
+    } else if (currentTool. startsWith('symbol')) {
         const type = currentTool === 'symbol-m' ? 'M' : 'X';
         const color = currentTool === 'symbol-m' ? 'red' : 'black';
+        
+        // Check if trying to add M symbol and limit is reached
+        if (type === 'M' && countMSymbols() >= 2) {
+            alert('Maximum of 2 "M" marks allowed');
+            isDragging = false;
+            return;
+        }
+        
         shapes.push({
             type: 'symbol', text: type, x: pos.x, y: pos.y, color: color
         });
@@ -315,6 +323,10 @@ function endAction(e) {
     }
     currentPathPoints = [];
     redrawCanvas();
+}
+
+function countMSymbols() {
+    return shapes.filter(s => s.type === 'symbol' && s.text === 'M').length;
 }
 
 // --- HIT DETECTION ---
