@@ -11,7 +11,7 @@
 
     <header class="app-header">
         <h1>Vet Markings</h1>
-        <span class="badge">v2.6</span>
+        <span class="badge">v2.7</span>
     </header>
 
     <main class="app-content">
@@ -130,25 +130,33 @@
                 </button>
             </div>
 
-            <div class="pdf-wrapper-scroller">
+            <div class="pdf-wrapper-scroller" id="pdf-wrapper-scroller">
+                <!-- Add zoom controls for PDF preview -->
+                <div class="pdf-zoom-controls">
+                    <button onclick="updatePDFZoom(0.1)" title="Zoom In">+</button>
+                    <button onclick="updatePDFZoom(-0.1)" title="Zoom Out">-</button>
+                    <button onclick="resetPDFZoom()" title="Reset View">R</button>
+                    <span class="zoom-indicator" id="pdf-zoom-level">100%</span>
+                </div>
+                
                 <div id="pdf-preview-container">
                     <div id="watermark">DRAFT</div>
                     <div class="pdf-section-header"><h3>VETERINARY MARKINGS CHART</h3></div>
                     
                     <div class="pdf-diagram-area" id="pdf-diagram-area">
-                        </div>
+                    </div>
 
                     <table class="pdf-table">
                         <tr>
                             <th>HEAD</th>
                             <td><span class="pdf-input-display" id="disp-head"></span></td>
-                            <th rowspan="8" style="vertical-align:top; background:#fff; width:40%;">
+                            <th rowspan="8" style="vertical-align: top; background:#fff; width:40%;">
                                 <strong>DETAILS</strong><br><br>
-                                Microchip: <span class="pdf-input-display" id="disp-microchip"></span><br><br>
-                                Sire: Galileo<br>
+                                Microchip:  <span class="pdf-input-display" id="disp-microchip"></span><br><br>
+                                Sire:  Galileo<br>
                                 Dam: Ouija Board<br>
                                 Date: <span class="pdf-input-display" id="disp-date"></span><br><br>
-                                <div style="border:1px solid #333; padding:10px; margin-top:20px;">
+                                <div style="border: 1px solid #333; padding:10px; margin-top:20px;">
                                     <strong>Vet Signature:</strong><br><br>
                                     <span style="font-family:'Brush Script MT', cursive; font-size:20px;" id="disp-sig"></span>
                                 </div>

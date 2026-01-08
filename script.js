@@ -29,14 +29,25 @@ let currentPathPoints = [];
 
 let confirmCallback = null;
 
+// PDF zoom state
+let pdfScale = 1;
+const MIN_PDF_ZOOM = 0.3;
+const MAX_PDF_ZOOM = 2;
+
 // --- SETUP ---
 function switchTab(tabId) {
-    if (tabId === 'preview') renderPreview();
+    if (tabId === 'preview') {
+        renderPreview();
+        // Reset PDF zoom when entering preview
+        setTimeout(() => {
+            resetPDFZoom();
+        }, 100);
+    }
     
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelector(`button[onclick="switchTab('${tabId}')"]`).classList.add('active');
     
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList. remove('active'));
     document.getElementById(`tab-${tabId}`).classList.add('active');
 
     // Important: When switching back to markings, ensure it fits correctly again
@@ -619,4 +630,32 @@ function generatePDF() {
     }).from(element).save()
     .then(() => { btn.innerText = txt; btn.disabled = false; })
     .catch(e => { alert(e.message); btn.innerText = txt; btn.disabled = false; });
+}
+
+// PDF zoom functions
+function updatePDFZoom(delta) {
+    let newScale = pdfScale + delta;
+    if (newScale < MIN_PDF_ZOOM) newScale = MIN_PDF_ZOOM;
+    if (newScale > MAX_PDF_ZOOM) newScale = MAX_PDF_ZOOM;
+    
+    pdfScale = newScale;
+    applyPDFZoom();
+}
+
+function resetPDFZoom() {
+    pdfScale = 1;
+    applyPDFZoom();
+}
+
+function applyPDFZoom() {
+    const pdfContainer = document.getElementById('pdf-preview-container');
+    const zoomIndicator = document.getElementById('pdf-zoom-level');
+    
+    if (pdfContainer) {
+        pdfContainer.style.transform = `scale(${pdfScale})`;
+    }
+    
+    if (zoomIndicator) {
+        zoomIndicator.textContent = Math.round(pdfScale * 100) + '%';
+    }
 }

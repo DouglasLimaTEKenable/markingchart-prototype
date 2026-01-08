@@ -436,7 +436,7 @@ input[type="checkbox"] {
 .floating-action-container {
     position: sticky;
     top: 60px;
-    z-index: 90;
+    z-index:  90;
     margin-bottom: 20px;
 }
 
@@ -458,12 +458,71 @@ input[type="checkbox"] {
 
 .pdf-wrapper-scroller {
     width: 100%;
-    overflow: hidden; /* We will scale instead of scroll */
+    overflow:  auto; /* Enable scrolling for zoomed content */
     display: flex;
     justify-content: center;
     background: #555;
-    padding: 20px 0;
+    padding: 20px;
     border-radius: 8px;
+    position: relative;
+    min-height: 500px;
+}
+
+/* PDF Zoom Controls */
+.pdf-zoom-controls {
+    position: sticky;
+    top: 20px;
+    right: 20px;
+    align-self: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 50;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
+    padding: 8px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    margin-left: auto;
+    margin-right: 20px;
+}
+
+.pdf-zoom-controls button {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    cursor:  pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s, background 0.2s;
+}
+
+.pdf-zoom-controls button:active {
+    background: #eee;
+    transform: scale(0.95);
+}
+
+.pdf-zoom-controls button:hover {
+    background: white;
+    border-color: var(--primary-color);
+}
+
+.zoom-indicator {
+    font-size: 11px;
+    font-weight: 600;
+    color: #333;
+    text-align: center;
+    padding:  4px 0;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 6px;
+    min-width: 40px;
 }
 
 #pdf-preview-container {
@@ -471,23 +530,39 @@ input[type="checkbox"] {
     min-height: 297mm;
     background: white;
     padding: 10mm;
-    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
     position: relative;
-    /* Scale down the PDF preview on mobile so it fits in view */
     transform-origin: top center;
-    transform: scale(0.43); /* Approximate scale for mobile portrait */
-    margin-bottom: -150mm; /* Compensate for the empty space left by scaling */
+    transition: transform 0.2s ease-out;
+    /* Remove fixed scaling on mobile */
+    transform: scale(1);
+    margin-bottom: 0;
 }
 
+/* Remove the media query that was forcing scale */
 @media(min-width: 768px) {
-    #pdf-preview-container { transform: scale(1); margin-bottom: 0; }
-    .pdf-wrapper-scroller { overflow-x: auto; display: block; }
+    #pdf-preview-container { 
+        transform: scale(1); 
+        margin-bottom: 0; 
+    }
 }
 
-/* PDF Specific Styles (Kept largely same for print consistency, but tidied) */
+/* Adjust wrapper for better zoom control */
+@media(max-width: 767px) {
+    .pdf-wrapper-scroller {
+        padding: 10px;
+    }
+    
+    .pdf-zoom-controls {
+        margin-right: 10px;
+    }
+}
+
+/* PDF Specific Styles */
 #watermark {
     position: absolute;
-    top: 50%; left: 50%;
+    top: 50%; 
+    left: 50%;
     transform: translate(-50%, -50%) rotate(-45deg);
     font-size: 150px;
     color: rgba(255, 0, 0, 0.1);
@@ -495,18 +570,22 @@ input[type="checkbox"] {
     pointer-events: none;
     z-index: 99;
     display: none;
-    border: 5px dashed rgba(255, 0, 0, 0.1);
+    border:  5px dashed rgba(255, 0, 0, 0.1);
     padding: 20px;
 }
 
-/* --- PDF PREVIEW STYLES --- */
-.pdf-section-header { text-align: center; border-bottom: 2px solid #333; margin-bottom: 10px; }
+.pdf-section-header { 
+    text-align: center; 
+    border-bottom: 2px solid #333; 
+    margin-bottom: 10px; 
+}
+
 .pdf-diagram-area { 
     width: 100%; 
     border: 1px solid #333; 
     margin-bottom: 10px; 
     background: white; 
-    overflow: hidden; /* Prevents spillover */
+    overflow: hidden;
 }
 
 .pdf-diagram-wrapper { 
@@ -516,7 +595,7 @@ input[type="checkbox"] {
 
 .pdf-diagram-wrapper img { 
     width: 100% !important; 
-    height: auto !important; 
+    height:  auto !important; 
     display: block; 
 }
 
@@ -524,10 +603,32 @@ input[type="checkbox"] {
     width: 100% !important; 
     height: 100% !important; 
 }
-.pdf-table { width: 100%; border-collapse: collapse; font-family: 'Times New Roman', serif; }
-.pdf-table th, .pdf-table td { border: 1px solid #333; padding: 6px; vertical-align: top; font-size: 12px; }
-.pdf-table th { background-color: #f0f0f0; width: 15%; text-align: left; }
-.pdf-input-display { font-family: 'Courier New', monospace; font-weight: bold; text-transform: uppercase; color: #000; }
+
+.pdf-table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    font-family: 'Times New Roman', serif; 
+}
+
+.pdf-table th, .pdf-table td { 
+    border: 1px solid #333; 
+    padding: 6px; 
+    vertical-align: top; 
+    font-size: 12px; 
+}
+
+.pdf-table th { 
+    background-color: #f0f0f0; 
+    width: 15%; 
+    text-align: left; 
+}
+
+.pdf-input-display { 
+    font-family: 'Courier New', monospace; 
+    font-weight: bold; 
+    text-transform: uppercase; 
+    color: #000; 
+}
 
 /* --- CUSTOM ALERT MODAL --- */
 .alert-overlay {
