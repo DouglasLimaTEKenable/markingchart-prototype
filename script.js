@@ -613,7 +613,8 @@ function renderPreview() {
     const dob = document.getElementById('input-dob');
     if (dob) document.getElementById('disp-dob').innerText = dob.value || '';
     
-    const species = document.querySelector('input[name="species"]:checked');
+    // Around line 544, REPLACE the species block with just:
+    const species = document.querySelector('input[name="species"]: checked');
     if (species) document.getElementById('disp-species').innerText = species.value || 'EQUINE';
     
     const location = document.getElementById('input-location');
@@ -992,6 +993,26 @@ function validateMandatoryFields() {
         missingFields.push('Canvas markings (at least one marking required)');
     }
     
+    // Validate marking description fields (HEAD, NECK, etc.)
+    const markingFields = [
+        { id: 'input-head', label: 'Head' },
+        { id: 'input-neck', label: 'Neck' },
+        { id: 'input-lf', label: 'Foreleg L' },
+        { id: 'input-rf', label: 'Foreleg R' },
+        { id: 'input-lh', label: 'Hindleg L' },
+        { id: 'input-rh', label: 'Hindleg R' },
+        { id:  'input-body', label:  'Body' },
+        { id: 'input-microchip', label: 'Microchip No.' }
+    ];
+    
+    markingFields.forEach(field => {
+        const el = document.getElementById(field. id);
+        if (!el || !el.value. trim()) {
+            missingFields.push(field.label);
+            if (el) el.classList.add('validation-error');
+        }
+    });
+
     // Check colour
     const colour = document.getElementById('input-colour');
     if (!colour.value) {
@@ -1013,10 +1034,14 @@ function validateMandatoryFields() {
         dob.classList.add('validation-error');
     }
     
-    // Check species (should always have one selected by default, but validate anyway)
     const species = document.querySelector('input[name="species"]:checked');
     if (!species) {
         missingFields.push('Species');
+        // Highlight the radio group container
+        const speciesGroup = document.querySelector('input[name="species"]').closest('.form-group');
+        if (speciesGroup) {
+            speciesGroup.classList.add('validation-error');
+        }
     }
     
     // Check vet reference (mandatory for Ireland)
@@ -1041,6 +1066,12 @@ function validateMandatoryFields() {
     if (!vetAddress.value.trim()) {
         missingFields.push('Veterinary Surgeon Details');
         vetAddress.classList.add('validation-error');
+    }
+
+    const microchip = document.getElementById('input-microchip');
+    if (!microchip. value. trim()) {
+        missingFields. push('Microchip No.');
+        microchip.classList. add('validation-error');
     }
     
     // Check vet stamp
@@ -1113,12 +1144,32 @@ window.addEventListener('load', function() {
                     document.getElementById('signature-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             } else {
-                // Hide signature section and clear signature
-                document.getElementById('signature-section').style.display = 'none';
-                if (signatureCanvas) {
-                    clearSignature();
+                // User is unchecking approval
+                if (signatureDataURL) {
+                    showCustomConfirm(
+                        'Unchecking will clear your signature. Are you sure? ',
+                        'Clear Signature? ',
+                        '⚠️',
+                        function() {
+                            document.getElementById('signature-section').style.display = 'none';
+                            if (signatureCanvas) {
+                                clearSignature();
+                            }
+                            signatureDataURL = null;
+                        }
+                    );
+                    // If user cancels, re-check the box
+                    setTimeout(() => {
+                        if (! signatureDataURL) { // User confirmed
+                            approveCheckbox. checked = false;
+                        } else {
+                            approveCheckbox.checked = true;
+                        }
+                    }, 100);
+                } else {
+                    // No signature yet, just hide
+                    document.getElementById('signature-section').style.display = 'none';
                 }
-                signatureDataURL = null;
             }
         });
     }
