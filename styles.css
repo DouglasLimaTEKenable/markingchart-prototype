@@ -528,3 +528,92 @@ input[type="checkbox"] {
 .pdf-table th, .pdf-table td { border: 1px solid #333; padding: 6px; vertical-align: top; font-size: 12px; }
 .pdf-table th { background-color: #f0f0f0; width: 15%; text-align: left; }
 .pdf-input-display { font-family: 'Courier New', monospace; font-weight: bold; text-transform: uppercase; color: #000; }
+
+/* --- CUSTOM ALERT MODAL --- */
+.alert-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:  rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease-out;
+}
+
+. alert-overlay.active {
+    display: flex;
+}
+
+.alert-modal {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    max-width:  320px;
+    width: 90%;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.alert-icon {
+    font-size: 48px;
+    margin-bottom:  16px;
+    animation: bounce 0.5s ease-out;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform:  translateY(-10px); }
+}
+
+.alert-title {
+    margin: 0 0 12px 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.alert-message {
+    margin: 0 0 24px 0;
+    font-size: 15px;
+    color: #666;
+    line-height: 1.5;
+}
+
+.alert-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 32px;
+    font-size:  16px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition:  transform 0.1s, background 0.2s;
+}
+
+.alert-btn:active {
+    transform: scale(0.97);
+    background: var(--primary-dark);
+}
+
+.alert-btn:hover {
+    background: var(--primary-dark);
+}
