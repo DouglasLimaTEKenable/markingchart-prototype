@@ -359,22 +359,33 @@ button.tool-btn.delete-btn:disabled {
 }
 
 /* --- ZOOM CONTROLS OVERLAY --- */
-zoom-controls {
+.zoom-controls {
     position: absolute;
-    /* CHANGE: Move from top to bottom to prevent toolbar overlap */
-    top: auto;
-    bottom: 15px;
-    right: 15px;
+    /* Fix:  Anchor to bottom-right corner */
+    bottom: 20px;
+    right: 20px;
+    top: auto; /* Override any previous top positioning */
+    left: auto; /* Override any previous left positioning */
+    
     display: flex;
     flex-direction: column;
     gap: 10px;
-    z-index: 50; 
+    
+    /* Fix: Increase z-index to ensure visibility above all elements */
+    z-index:  1000;
+    
+    /* Fix: Add semi-transparent background for better visibility */
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
+    padding: 8px;
+    border-radius:  12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .zoom-controls button {
     width: 40px;
     height: 40px;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.95);
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 20px;
@@ -385,6 +396,9 @@ zoom-controls {
     display: flex;
     align-items: center;
     justify-content: center;
+    
+    /* Ensure buttons remain interactive */
+    pointer-events: auto;
 }
 
 .zoom-controls button:active {
@@ -392,9 +406,9 @@ zoom-controls {
     transform: scale(0.95);
 }
 
-/* --- MARKINGS INPUTS --- */
-.input-stack .form-group {
-    margin-bottom: 12px;
+.zoom-controls button:hover {
+    background: white;
+    border-color: var(--primary-color);
 }
 
 /* --- APPROVAL --- */
