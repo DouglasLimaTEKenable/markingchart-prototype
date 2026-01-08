@@ -581,7 +581,7 @@ function renderPreview() {
     // 4. Create a Preview Canvas overlay
     const pCanvas = document.createElement('canvas');
     pCanvas.width = canvas.width;
-    pCanvas.height = canvas.height;
+    pCanvas. height = canvas.height;
     
     const pCtx = pCanvas.getContext('2d');
     pCtx.drawImage(canvas, 0, 0);
@@ -590,7 +590,7 @@ function renderPreview() {
     pCanvas.style.top = '0';
     pCanvas.style.left = '0';
     pCanvas.style.width = '100%';
-    pCanvas.style.height = '100%';
+    pCanvas. style.height = '100%';
 
     wrapper.appendChild(pCanvas);
     container.appendChild(wrapper);
@@ -613,8 +613,8 @@ function renderPreview() {
     const dob = document.getElementById('input-dob');
     if (dob) document.getElementById('disp-dob').innerText = dob.value || '';
     
-    // Around line 544, REPLACE the species block with just:
-    const species = document.querySelector('input[name="species"]: checked');
+    // FIX: Remove extra space in selector
+    const species = document. querySelector('input[name="species"]:checked');
     if (species) document.getElementById('disp-species').innerText = species.value || 'EQUINE';
     
     const location = document.getElementById('input-location');
@@ -638,9 +638,9 @@ function renderPreview() {
     if (vetStampInput && vetStampInput.files && vetStampInput.files[0] && vetStampDisplay) {
         const reader = new FileReader();
         reader.onload = function(e) {
-            vetStampDisplay.innerHTML = '<img src="' + e.target.result + '" style="width: 100%; height: auto;">';
+            vetStampDisplay. innerHTML = '<img src="' + e.target. result + '" style="width:  100%; height: auto;">';
         };
-        reader.readAsDataURL(vetStampInput.files[0]);
+        reader. readAsDataURL(vetStampInput.files[0]);
     } else if (vetStampDisplay) {
         vetStampDisplay.innerHTML = '';
     }
@@ -650,7 +650,7 @@ function renderPreview() {
     const sigDate = document.getElementById('disp-sig-date');
     if (signatureDataURL && sigImage) {
         sigImage.src = signatureDataURL;
-        sigImage.style.display = 'block';
+        sigImage.style. display = 'block';
         if (sigDate) {
             const today = new Date().toLocaleDateString('en-GB');
             sigDate.innerText = today;
@@ -662,7 +662,7 @@ function renderPreview() {
 
     const isApproved = document.getElementById('approve-chk').checked;
     document.getElementById('disp-status').innerText = isApproved ? 'APPROVED' : 'DRAFT';
-    document.getElementById('watermark').style.display = isApproved ?  'none' : 'block';
+    document.getElementById('watermark').style.display = isApproved ?   'none' : 'block';
 }
 
 function generatePDF() {
