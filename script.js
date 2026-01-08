@@ -614,7 +614,7 @@ function renderPreview() {
 
 function generatePDF() {
     if (typeof html2pdf === 'undefined') return alert('PDF Lib missing');
-    const element = document.getElementById('pdf-preview-container');
+    const element = document. getElementById('pdf-preview-container');
     const btn = document.getElementById('btn-download');
     const txt = btn.innerText;
     
@@ -623,34 +623,31 @@ function generatePDF() {
     element.style.transform = 'scale(1)';
     
     btn.innerText = "Generating...";
-    btn. disabled = true;
+    btn.disabled = true;
 
     const opt = {
-        margin: 5, // Reduced from 10 to prevent cutting
+        margin: [5, 5, 5, 5], // [top, left, bottom, right] in mm
         filename: 'MarkingChart.pdf',
-        image: { type: 'jpeg', quality: 0.95 },
-        html2canvas: { 
-            scale: 2, // Increased back to 2 for better quality
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { 
+            scale: 2,
             useCORS: true,
             logging: false,
-            scrollY: 0,
-            scrollX: 0,
-            width: element.scrollWidth, // Use scroll width for full content
-            height: element.scrollHeight, // Use scroll height for full content
-            windowWidth: element.scrollWidth,
-            windowHeight: element.scrollHeight,
-            x: 0,
-            y:  0
+            scrollY: -window.scrollY,
+            scrollX: -window. scrollX,
+            windowWidth: 794, // A4 width in pixels at 96 DPI (210mm)
+            windowHeight: 1123, // A4 height in pixels at 96 DPI (297mm)
+            width: element.offsetWidth,
+            height: element.offsetHeight
         },
-        jsPDF: { 
+        jsPDF:  { 
             unit: 'mm', 
-            format: 'a4',
+            format: [210, 297], // Explicit A4 dimensions
             orientation: 'portrait',
             compress: true
         },
-        pagebreak: { 
-            mode: ['avoid-all', 'css', 'legacy'],
-            after: '. avoid-break'
+        pagebreak:  { 
+            mode: 'avoid-all'
         }
     };
 
