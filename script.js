@@ -517,3 +517,93 @@ function generatePDF() {
     .then(() => { btn.innerText = txt; btn.disabled = false; })
     .catch(e => { alert(e.message); btn.innerText = txt; btn.disabled = false; });
 }
+
+// custom alert functions
+function showCustomAlert(message, title = 'Notice') {
+    const overlay = document. getElementById('custom-alert-overlay');
+    const titleEl = document.getElementById('alert-title');
+    const messageEl = document.getElementById('alert-message');
+    
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+    overlay.classList.add('active');
+    
+    // Prevent body scroll when modal is open
+    document.body.style.overflow = 'hidden';
+}
+
+function closeCustomAlert() {
+    const overlay = document.getElementById('custom-alert-overlay');
+    overlay.classList.remove('active');
+    
+    // Restore body scroll
+    document.body.style.overflow = '';
+}
+
+// Close modal when clicking outside of it
+document.addEventListener('DOMContentLoaded', function() {
+    const overlay = document.getElementById('custom-alert-overlay');
+    if (overlay) {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) {
+                closeCustomAlert();
+            }
+        });
+    }
+});
+
+// Modify the startAction function - replace the alert line
+function startAction(e) {
+    if (e.cancelable) e.preventDefault();
+    
+    // Get raw screen coords for drag delta calculations
+    let cx, cy;
+    if (e.changedTouches && e.changedTouches. length > 0) {
+        cx = e.changedTouches[0].clientX;
+        cy = e.changedTouches[0].clientY;
+    } else {
+        cx = e.clientX;
+        cy = e.clientY;
+    }
+
+    isDragging = true;
+    dragStartPos = { x: cx, y:  cy }; 
+
+    // --- PANNING LOGIC ---
+    if (currentTool === 'view-pan') {
+        canvas.style.cursor = "grabbing";
+        wrapper.style.transition = "none";
+        panStart = { x:  panX, y: panY };
+        return; 
+    }
+
+    // --- DRAWING/SELECTING LOGIC ---
+    const pos = getPos(e);
+
+    if (currentTool === 'select') {
+        const foundIndex = findShapeAt(pos);
+        selectedShapeIndex = foundIndex;
+        document.getElementById('btn-delete').disabled = (selectedShapeIndex === -1);
+        redrawCanvas();
+    } else if (currentTool. startsWith('symbol')) {
+        const type = currentTool === 'symbol-m' ? 'M' : 'X';
+        const color = currentTool === 'symbol-m' ? 'red' : 'black';
+        
+        // Check if trying to add M symbol and limit is reached
+        if (type === 'M' && countMSymbols() >= 2) {
+            // Use custom alert instead of browser alert
+            showCustomAlert('Maximum of 2 "M" marks allowed', 'Limit Reached');
+            isDragging = false;
+            return;
+        }
+        
+        shapes.push({
+            type: 'symbol', text: type, x: pos. x, y: pos.y, color: color
+        });
+        isDragging = false; 
+        redrawCanvas();
+    } else {
+        currentPathPoints = [{x: pos.x, y: pos.y}];
+        redrawCanvas();
+    }
+}
