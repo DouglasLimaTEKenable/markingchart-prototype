@@ -47,7 +47,7 @@ function switchTab(tabId) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelector(`button[onclick="switchTab('${tabId}')"]`).classList.add('active');
     
-    document.querySelectorAll('.tab-content').forEach(c => c.classList. remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     document.getElementById(`tab-${tabId}`).classList.add('active');
 
     // Important: When switching back to markings, ensure it fits correctly again
@@ -622,38 +622,39 @@ function generatePDF() {
     const currentScale = pdfScale;
     element.style.transform = 'scale(1)';
     
-    btn.innerText = "Generating... ";
+    btn.innerText = "Generating...";
     btn.disabled = true;
 
-    html2pdf().set({
-        margin: [10, 10, 10, 10], // Changed from 0 to add margins
-        filename: 'MarkingChart. pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-            scale: 2, 
+    const opt = {
+        margin: 10,
+        filename: 'MarkingChart.pdf',
+        image: { type: 'jpeg', quality: 0.95 },
+        html2canvas:  { 
+            scale: 1.5, // Reduced from 2
             useCORS: true,
             logging: false,
-            windowWidth: element.scrollWidth,
-            windowHeight: element.scrollHeight
+            height: element.offsetHeight, // Use actual height
+            windowHeight: element.offsetHeight
         },
         jsPDF: { 
-            unit: 'mm', 
+            unit:  'mm', 
             format: 'a4',
-            orientation: 'portrait'
+            orientation: 'portrait',
+            compress: true
         },
-        pagebreak: { mode: 'avoid-all' } // Prevent page breaks
-    }).from(element).save()
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    };
+
+    html2pdf().set(opt).from(element).save()
     .then(() => { 
         btn.innerText = txt; 
         btn.disabled = false;
-        // Restore scale
         element.style.transform = `scale(${currentScale})`;
     })
     .catch(e => { 
         alert(e.message); 
         btn.innerText = txt; 
         btn.disabled = false;
-        // Restore scale
         element.style.transform = `scale(${currentScale})`;
     });
 }
