@@ -11,7 +11,7 @@
 
     <header class="app-header">
         <h1>Vet Markings</h1>
-        <span class="badge">v2.5</span>
+        <span class="badge">v2.6</span>
     </header>
 
     <main class="app-content">
@@ -168,13 +168,19 @@
     
     </main>
 	
-	<!-- Custom Alert Modal -->
+	<!-- Custom Alert/Confirm Modal -->
     <div id="custom-alert-overlay" class="alert-overlay">
         <div class="alert-modal">
-            <div class="alert-icon">⚠️</div>
+            <div class="alert-icon" id="alert-icon">⚠️</div>
             <h3 class="alert-title" id="alert-title">Alert</h3>
             <p class="alert-message" id="alert-message"></p>
-            <button class="alert-btn" onclick="closeCustomAlert()">OK</button>
+            <div id="alert-buttons">
+                <button class="alert-btn" onclick="closeCustomAlert()">OK</button>
+            </div>
+            <div id="confirm-buttons" style="display: none;">
+                <button class="alert-btn alert-btn-secondary" onclick="cancelConfirm()">Cancel</button>
+                <button class="alert-btn alert-btn-danger" onclick="confirmAction()">Clear</button>
+            </div>
         </div>
     </div>
 

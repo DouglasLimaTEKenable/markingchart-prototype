@@ -2,6 +2,8 @@ const CACHE_NAME = 'hsi-vet-app-v1';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
+  './styles.css',
+  './script.js',
   './Section1.png',
   './icon-192.png',
   './icon-512.png',

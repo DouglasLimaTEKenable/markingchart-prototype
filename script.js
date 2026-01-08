@@ -27,6 +27,8 @@ let panStart = { x:  0, y: 0 };
 // For Drawing Paths
 let currentPathPoints = [];
 
+let confirmCallback = null;
+
 // --- SETUP ---
 function switchTab(tabId) {
     if (tabId === 'preview') renderPreview();
@@ -206,24 +208,67 @@ function countMSymbols() {
 }
 
 // Custom alert functions
-function showCustomAlert(message, title = 'Notice') {
+function showCustomAlert(message, title = 'Notice', icon = '⚠️') {
     const overlay = document.getElementById('custom-alert-overlay');
     const titleEl = document.getElementById('alert-title');
     const messageEl = document.getElementById('alert-message');
+    const iconEl = document.getElementById('alert-icon');
+    const alertButtons = document.getElementById('alert-buttons');
+    const confirmButtons = document.getElementById('confirm-buttons');
     
     // Check if elements exist
-    if (! overlay || !titleEl || !messageEl) {
+    if (!overlay || !titleEl || !messageEl || !iconEl) {
         console.error('Alert elements not found');
         alert(message); // Fallback to browser alert
         return;
     }
     
+    // Set content
     titleEl.textContent = title;
     messageEl.textContent = message;
+    iconEl.textContent = icon;
+    
+    // Show alert mode (single OK button)
+    alertButtons.style.display = 'flex';
+    confirmButtons.style.display = 'none';
+    
     overlay.classList.add('active');
     
     // Prevent body scroll when modal is open
-    document.body.style.overflow = 'hidden';
+    document.body. style.overflow = 'hidden';
+}
+
+function showCustomConfirm(message, title = 'Confirm', icon = '❓', onConfirm) {
+    const overlay = document.getElementById('custom-alert-overlay');
+    const titleEl = document.getElementById('alert-title');
+    const messageEl = document.getElementById('alert-message');
+    const iconEl = document. getElementById('alert-icon');
+    const alertButtons = document.getElementById('alert-buttons');
+    const confirmButtons = document.getElementById('confirm-buttons');
+    
+    // Check if elements exist
+    if (!overlay || !titleEl || !messageEl || !iconEl) {
+        console.error('Confirm elements not found');
+        if (confirm(message)) onConfirm(); // Fallback to browser confirm
+        return;
+    }
+    
+    // Set content
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+    iconEl.textContent = icon;
+    
+    // Show confirm mode (Cancel + Action buttons)
+    alertButtons.style.display = 'none';
+    confirmButtons.style. display = 'flex';
+    
+    // Store callback
+    confirmCallback = onConfirm;
+    
+    overlay.classList.add('active');
+    
+    // Prevent body scroll when modal is open
+    document. body.style.overflow = 'hidden';
 }
 
 function closeCustomAlert() {
@@ -232,8 +277,22 @@ function closeCustomAlert() {
         overlay.classList.remove('active');
     }
     
+    // Clear callback
+    confirmCallback = null;
+    
     // Restore body scroll
     document.body.style.overflow = '';
+}
+
+function cancelConfirm() {
+    closeCustomAlert();
+}
+
+function confirmAction() {
+    if (confirmCallback && typeof confirmCallback === 'function') {
+        confirmCallback();
+    }
+    closeCustomAlert();
 }
 
 // Initialize modal click handler
@@ -247,6 +306,20 @@ window.addEventListener('load', function() {
         });
     }
 });
+
+// Update the clearAll function to use custom confirm
+function clearAll() {
+    showCustomConfirm(
+        'Are you sure you want to clear the entire chart?  This action cannot be undone.',
+        'Clear Chart',
+        '🗑️',
+        function() {
+            shapes = [];
+            selectedShapeIndex = -1;
+            redrawCanvas();
+        }
+    );
+}
 
 // --- INPUT HANDLING ---
 function startAction(e) {
