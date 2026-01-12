@@ -666,7 +666,7 @@ function renderPreview() {
     if (vetStampInput && vetStampInput.files && vetStampInput.files[0] && vetStampDisplay) {
         const reader = new FileReader();
         reader.onload = function(e) {
-            vetStampDisplayinnerHTML = '<img src="' + e.target.result + '" style="width:  100%; height: auto;">';
+            vetStampDisplay.innerHTML = '<img src="' + e.target.result + '" style="width:  100%; height: auto;">';
         };
         reader.readAsDataURL(vetStampInput.files[0]);
     } else if (vetStampDisplay) {
@@ -1259,6 +1259,6 @@ function showValidationErrors(missingFields) {
 function closeValidationBox() {
     const errorBox = document.getElementById('validation-error-box');
     if (errorBox) {
-        errorBox.style. display = 'none';
+        errorBox.style.display = 'none';
     }
 }
