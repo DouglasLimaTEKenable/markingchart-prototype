@@ -628,6 +628,35 @@ function renderPreview() {
     const ueln = document.getElementById('input-ueln');
     if (ueln) document.getElementById('disp-ueln').innerText = ueln.value || 'N/A';
     
+    // UPDATED: Map additional microchips
+    const microchip2 = document.getElementById('input-microchip-2');
+    const microchip3 = document.getElementById('input-microchip-3');
+    const additionalDisplay = document.getElementById('disp-microchip-additional');
+
+    if (additionalDisplay) {
+        // Clear previous content
+        additionalDisplay.innerHTML = '';
+        
+        if (microchip2 && microchip2.value.trim()) {
+            const line1 = document.createElement('div');
+            line1.style.fontSize = '10px';
+            const label1 = document.createElement('strong');
+            label1.textContent = 'Additional 1: ';
+            line1.appendChild(label1);
+            line1.appendChild(document.createTextNode(microchip2.value.trim()));
+            additionalDisplay.appendChild(line1);
+        }
+        if (microchip3 && microchip3.value.trim()) {
+            const line2 = document.createElement('div');
+            line2.style.fontSize = '10px';
+            const label2 = document.createElement('strong');
+            label2.textContent = 'Additional 2: ';
+            line2.appendChild(label2);
+            line2.appendChild(document.createTextNode(microchip3.value.trim()));
+            additionalDisplay.appendChild(line2);
+        }
+    }
+    
     const dateEl = document.getElementById('exam-date');
     if(dateEl) document.getElementById('disp-date').innerText = dateEl.value;
 
@@ -681,9 +710,15 @@ function generatePDF() {
 
     // Use a timeout to ensure DOM is settled
     setTimeout(() => {
+        // Get microchip number for filename
+        const microchipInput = document.getElementById('input-microchip');
+        const microchipNumber = microchipInput && microchipInput.value.trim() 
+            ? microchipInput.value.trim().replace(/[^a-zA-Z0-9]/g, '_') // Sanitize filename
+            : 'MarkingChart';
+
         const opt = {
             margin:  0,
-            filename: 'MarkingChart.pdf',
+            filename: `${microchipNumber}.pdf`, // CHANGED: Use microchip number
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { 
                 scale: 2,
@@ -1050,15 +1085,13 @@ function validateMandatoryFields() {
         }
     }
     
-    // Check vet reference (mandatory for Ireland)
+    // Check vet reference (alphanumeric allowed)
     const vetRef = document.getElementById('input-vet-ref');
-    if (!vetRef.value) {
+    if (!vetRef.value || !vetRef.value.trim()) {
         missingFields.push('Vet Reference No.');
         vetRef.classList.add('validation-error');
-    } else if (!vetRef.value.match(/^\d{3}\/\d{3}$/)) {
-        missingFields.push('Vet Reference No. (invalid format - use XXX/XXX)');
-        vetRef.classList.add('validation-error');
     }
+    // Remove format validation - allow any alphanumeric format
     
     // Check location
     const location = document.getElementById('input-location');
@@ -1085,6 +1118,13 @@ function validateMandatoryFields() {
     if (!vetStamp.files || vetStamp.files.length === 0) {
         missingFields.push('Veterinary Stamp');
         vetStamp.classList.add('validation-error');
+    }
+    
+    // Check microchip image (NOW MANDATORY)
+    const microchipImage = document.getElementById('input-microchip-image');
+    if (!microchipImage.files || microchipImage.files.length === 0) {
+        missingFields.push('Microchip Reader Image (Required from Dec 1st 2024)');
+        microchipImage.classList.add('validation-error');
     }
     
     return missingFields;
