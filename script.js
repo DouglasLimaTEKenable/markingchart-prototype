@@ -639,7 +639,7 @@ function renderPreview() {
         
         if (microchip2 && microchip2.value.trim()) {
             const line1 = document.createElement('div');
-            line1.style.fontSize = '10px';
+            line1.className = 'pdf-microchip-additional-line';
             const label1 = document.createElement('strong');
             label1.textContent = 'Additional 1: ';
             line1.appendChild(label1);
@@ -648,7 +648,7 @@ function renderPreview() {
         }
         if (microchip3 && microchip3.value.trim()) {
             const line2 = document.createElement('div');
-            line2.style.fontSize = '10px';
+            line2.className = 'pdf-microchip-additional-line'; 
             const label2 = document.createElement('strong');
             label2.textContent = 'Additional 2: ';
             line2.appendChild(label2);
@@ -678,13 +678,13 @@ function renderPreview() {
     const sigDate = document.getElementById('disp-sig-date');
     if (signatureDataURL && sigImage) {
         sigImage.src = signatureDataURL;
-        sigImage.style.display = 'block';
+        sigImage.classList.add('active');
         if (sigDate) {
             const today = new Date().toLocaleDateString('en-GB');
             sigDate.innerText = today;
         }
     } else if (sigImage) {
-        sigImage.style.display = 'none';
+        sigImage.classList.remove('active');
         if (sigDate) sigDate.innerText = '';
     }
 
@@ -932,14 +932,14 @@ function previewVetStamp(input) {
     const reader = new FileReader();
     reader.onload = function(e) {
         document.getElementById('stamp-img').src = e.target.result;
-        document.getElementById('stamp-preview').style.display = 'block';
+        document.getElementById('stamp-preview').classList.add('active');
     };
     reader.readAsDataURL(file);
 }
 
 function clearVetStamp() {
     document.getElementById('input-vet-stamp').value = '';
-    document.getElementById('stamp-preview').style.display = 'none';
+    document.getElementById('stamp-preview').classList.remove('active');
     document.getElementById('stamp-img').src = '';
 }
 
@@ -957,14 +957,14 @@ function previewMicrochipImage(input) {
     const reader = new FileReader();
     reader.onload = function(e) {
         document.getElementById('microchip-img').src = e.target.result;
-        document.getElementById('microchip-image-preview').style.display = 'block';
+        document.getElementById('microchip-image-preview').classList.add('active');
     };
     reader.readAsDataURL(file);
 }
 
 function clearMicrochipImage() {
     document.getElementById('input-microchip-image').value = '';
-    document.getElementById('microchip-image-preview').style.display = 'none';
+    document.getElementById('microchip-image-preview').classList.remove('active');
     document.getElementById('microchip-img').src = '';
 }
 
@@ -1182,7 +1182,7 @@ window.addEventListener('load', function() {
                     closeValidationBox();
                     
                     // Show signature pad
-                    document.getElementById('signature-section').style.display = 'block';
+                    document.getElementById('signature-section').classList.add('active');
                     
                     // Initialize signature pad if not already done
                     if (!signatureCanvas) {
@@ -1203,7 +1203,7 @@ window.addEventListener('load', function() {
                         'Clear Signature? ',
                         '⚠️',
                         function() {
-                            document.getElementById('signature-section').style.display = 'none';
+                            document.getElementById('signature-section').classList.remove('active');
                             if (signatureCanvas) {
                                 clearSignature();
                             }
@@ -1220,7 +1220,7 @@ window.addEventListener('load', function() {
                     }, 100);
                 } else {
                     // No signature yet, just hide
-                    document.getElementById('signature-section').style.display = 'none';
+                    document.getElementById('signature-section').classList.remove('active');
                 }
             }
         });

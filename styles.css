@@ -948,3 +948,284 @@ textarea.validation-error:focus {
 .validation-dismiss-btn:hover {
     background: #e6352a;
 }
+
+/* --- FORM FIELD HINTS & LABELS --- */
+.field-hint {
+    font-size: 10px;
+    color: #888;
+    font-weight: normal;
+}
+
+.date-input {
+    padding: 12px;
+}
+
+/* --- MICROCHIP FIELDS --- */
+.microchip-input-uppercase {
+    text-transform: uppercase;
+}
+
+/* --- SPECIES SELECTION --- */
+.species-radio-group {
+    display:  flex;
+    gap: 20px;
+    padding-top: 8px;
+}
+
+.species-radio-label {
+    text-transform: none;
+    font-weight: normal;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.species-radio-input {
+    width: auto;
+    margin:  0;
+}
+
+/* --- LOCATION FIELD WITH GPS --- */
+.location-input-group {
+    display: flex;
+    gap: 8px;
+}
+
+.location-input-field {
+    flex: 1;
+}
+
+.gps-button {
+    min-width: 60px;
+    padding: 0 12px;
+    white-space: nowrap;
+    height: 44px;
+}
+
+.gps-coords-display {
+    font-size:  11px;
+    color:  #888;
+    margin-top: 4px;
+    font-style: italic;
+}
+
+/* --- VET ADDRESS --- */
+.vet-address-textarea {
+    text-transform: none;
+}
+
+/* --- FILE UPLOAD PREVIEWS --- */
+.file-preview-container {
+    margin-top: 10px;
+    max-width: 200px;
+    border: 1px dashed #ccc;
+    border-radius: 8px;
+    padding: 8px;
+    display: none;
+}
+
+.file-preview-container.active {
+    display: block;
+}
+
+.file-preview-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.file-preview-remove-btn {
+    margin-top: 8px;
+    padding: 6px 12px;
+    font-size: 12px;
+    background: #f2f2f7;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.file-preview-remove-btn:hover {
+    background: #e5e5ea;
+}
+
+.file-preview-remove-btn:active {
+    background: #d1d1d6;
+}
+
+/* Microchip image preview (no dashed border) */
+.microchip-image-preview-container {
+    margin-top:  10px;
+    max-width: 200px;
+    display: none;
+}
+
+.microchip-image-preview-container.active {
+    display: block;
+}
+
+.microchip-preview-image {
+    width: 100%;
+    height: auto;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+/* --- SIGNATURE SECTION --- */
+.signature-section-container {
+    display: none;
+    background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%);
+    border: 2px solid #ffc107;
+}
+
+.signature-section-container.active {
+    display: block;
+}
+
+.signature-section-title {
+    color: #856404;
+    margin-bottom: 12px;
+}
+
+.signature-section-intro {
+    font-size: 14px;
+    color: #856404;
+    margin-bottom:  16px;
+    line-height: 1.5;
+}
+
+.signature-pad-wrapper {
+    background: white;
+    border-radius: 12px;
+    padding: 12px;
+    border: 2px dashed #ffc107;
+}
+
+.signature-pad-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.signature-canvas {
+    border: 2px solid #333;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 500px;
+    height: 150px;
+    background: white;
+    touch-action: none;
+    cursor: crosshair;
+    display: block;
+}
+
+.signature-button-group {
+    margin-top: 12px;
+    display: flex;
+    gap:  10px;
+    flex-wrap: wrap;
+}
+
+.signature-clear-btn {
+    flex: 1;
+    min-width: 120px;
+}
+
+.signature-accept-btn {
+    flex: 2;
+    min-width: 150px;
+}
+
+.signature-tip {
+    font-size: 12px;
+    color: #856404;
+    margin-top: 12px;
+    font-style: italic;
+}
+
+/* --- PDF PREVIEW SPECIFIC --- */
+.pdf-animal-details-container {
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.pdf-section-heading {
+    font-size: 12px;
+}
+
+.pdf-divider {
+    margin: 8px 0;
+    border:  none;
+    border-top:  1px solid #ccc;
+}
+
+.pdf-microchip-additional-line {
+    font-size: 10px;
+}
+
+.pdf-location-text {
+    font-size: 10px;
+}
+
+.pdf-vet-address-text {
+    white-space: pre-wrap;
+    font-size: 10px;
+    text-transform: none;
+}
+
+.pdf-vet-stamp-display {
+    max-width: 100px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.pdf-vet-stamp-image {
+    width: 100%;
+    height: auto;
+}
+
+.pdf-signature-box {
+    border: 2px solid #333;
+    padding: 8px;
+    background: #fff;
+}
+
+.pdf-signature-heading {
+    font-size: 11px;
+}
+
+.pdf-signature-image {
+    max-width: 100%;
+    height: 50px;
+    display: none;
+    margin:  4px 0;
+}
+
+.pdf-signature-image.active {
+    display: block;
+}
+
+.pdf-signature-date {
+    font-size: 10px;
+}
+
+.pdf-signature-date-label {
+    font-size: 10px;
+}
+
+.pdf-detail-cell-content {
+    font-size: 11px;
+    line-height:  1.6;
+}
+
+/* PDF table detail cell */
+.pdf-detail-cell {
+    vertical-align: top;
+    background:  #fff;
+    width: 42%;
+    padding: 12px;
+}
