@@ -681,7 +681,7 @@ function renderPreview() {
         sigImage.classList.add('active');
         if (sigDate) {
             const today = new Date().toLocaleDateString('en-GB');
-            sigDate.innerText = formatDateToDDMMYYYY(today) || '';
+            sigDate.innerText = today;
         }
     } else if (sigImage) {
         sigImage.classList.remove('active');
