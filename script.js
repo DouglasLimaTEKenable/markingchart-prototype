@@ -639,7 +639,7 @@ function renderPreview() {
             additionalText += `<strong>Additional 1:</strong> ${microchip2.value.trim()}<br>`;
         }
         if (microchip3 && microchip3.value.trim()) {
-            additionalText += `<strong>Additional 2:</strong> ${microchip3.value.trim()}`;
+            additionalText += `<strong>Additional 2:</strong> ${microchip3.value.trim()}<br>`;
         }
         additionalDisplay.innerHTML = additionalText;
     }
@@ -1110,7 +1110,7 @@ function validateMandatoryFields() {
     // Check microchip image (NOW MANDATORY)
     const microchipImage = document.getElementById('input-microchip-image');
     if (!microchipImage.files || microchipImage.files.length === 0) {
-        missingFields.push('Microchip Reader Image (Required from Dec 1st)');
+        missingFields.push('Microchip Reader Image (Required from Dec 1st 2024)');
         microchipImage.classList.add('validation-error');
     }
     
