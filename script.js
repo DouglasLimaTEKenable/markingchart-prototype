@@ -370,9 +370,9 @@ function startAction(e) {
         const color = currentTool === 'symbol-m' ? 'red' : 'black';
         
         // Check if trying to add M symbol and limit is reached
-        if (type === 'M' && countMSymbols() >= 2) {
+        if (type === 'M' && countMSymbols() >= 3) {
             // Use custom alert instead of browser alert
-            showCustomAlert('Maximum of 2 "M" marks allowed', 'Limit Reached');
+            showCustomAlert('Maximum of 3 "M" marks allowed', 'Limit Reached');
             isDragging = false;
             return;
         }
