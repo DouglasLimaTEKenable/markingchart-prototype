@@ -731,7 +731,7 @@ function generatePDF() {
             jsPDF: { 
                 unit: 'mm', 
                 format: 'a4',
-                orientation: 'landscape'
+                orientation: 'portrait'
             },
             pagebreak:  { 
                 mode: 'avoid-all'
