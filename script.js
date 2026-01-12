@@ -634,14 +634,27 @@ function renderPreview() {
     const additionalDisplay = document.getElementById('disp-microchip-additional');
 
     if (additionalDisplay) {
-        let additionalText = '';
+        // Clear previous content
+        additionalDisplay.innerHTML = '';
+        
         if (microchip2 && microchip2.value.trim()) {
-            additionalText += `<strong>Additional 1:</strong> ${microchip2.value.trim()}<br>`;
+            const line1 = document.createElement('div');
+            line1.style.fontSize = '10px';
+            const label1 = document.createElement('strong');
+            label1.textContent = 'Additional 1: ';
+            line1.appendChild(label1);
+            line1.appendChild(document.createTextNode(microchip2.value.trim()));
+            additionalDisplay.appendChild(line1);
         }
         if (microchip3 && microchip3.value.trim()) {
-            additionalText += `<strong>Additional 2:</strong> ${microchip3.value.trim()}<br>`;
+            const line2 = document.createElement('div');
+            line2.style.fontSize = '10px';
+            const label2 = document.createElement('strong');
+            label2.textContent = 'Additional 2: ';
+            line2.appendChild(label2);
+            line2.appendChild(document.createTextNode(microchip3.value.trim()));
+            additionalDisplay.appendChild(line2);
         }
-        additionalDisplay.innerHTML = additionalText;
     }
     
     const dateEl = document.getElementById('exam-date');
