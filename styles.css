@@ -1153,26 +1153,34 @@ textarea.validation-error:focus {
 
 .pdf-section-heading {
     font-size: 12px;
+    font-weight: bold;
+    display: block;
+    margin-top: 4px;
+    margin-bottom:  2px;
 }
 
 .pdf-divider {
     margin: 8px 0;
     border:  none;
-    border-top:  1px solid #ccc;
+    border-top: 1px solid #ccc;
 }
 
 .pdf-microchip-additional-line {
     font-size: 10px;
+    margin: 2px 0;
 }
 
 .pdf-location-text {
     font-size: 10px;
+    display: inline;
 }
 
 .pdf-vet-address-text {
     white-space: pre-wrap;
     font-size: 10px;
     text-transform: none;
+    display: block;
+    margin:  4px 0;
 }
 
 .pdf-vet-stamp-display {
@@ -1191,11 +1199,15 @@ textarea.validation-error:focus {
 .pdf-signature-box {
     border: 2px solid #333;
     padding: 8px;
-    background: #fff;
+    background:  #fff;
+    margin-top: 4px;
 }
 
 .pdf-signature-heading {
     font-size: 11px;
+    font-weight:  bold;
+    display: block;
+    margin-bottom: 4px;
 }
 
 .pdf-signature-image {
@@ -1215,17 +1227,17 @@ textarea.validation-error:focus {
 
 .pdf-signature-date-label {
     font-size: 10px;
+    font-weight: bold;
 }
 
-.pdf-detail-cell-content {
-    font-size: 11px;
-    line-height:  1.6;
-}
-
-/* PDF table detail cell */
 .pdf-detail-cell {
     vertical-align: top;
-    background:  #fff;
+    background: #fff;
     width: 42%;
-    padding: 12px;
+    padding:  12px;
+}
+
+/* Make sure all strong tags in PDF preview are bold */
+.pdf-animal-details-container strong {
+    font-weight: bold;
 }
