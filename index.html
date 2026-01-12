@@ -11,11 +11,10 @@
 
     <header class="app-header">
         <h1>Vet Markings</h1>
-        <span class="badge">v3.1</span>
+        <span class="badge">v3.2</span>
     </header>
 
     <main class="app-content">
-        
         <div id="tab-request" class="tab-content active">
             <div class="card">
                 <h2 class="section-title">Horse Details</h2>
@@ -57,18 +56,6 @@
         </div>
 
         <div id="tab-markings" class="tab-content">
-            <!-- Validation Error Area (Initially Hidden) -->
-            <div id="validation-error-box" class="validation-error-box" style="display: none;">
-                <div class="validation-error-header">
-                    <span class="validation-error-icon">⚠️</span>
-                    <h3>Please Complete Required Fields</h3>
-                    <button type="button" onclick="closeValidationBox()" class="validation-close-btn">✕</button>
-                </div>
-                <p class="validation-error-intro">The following fields are required before approval:</p>
-                <ul id="validation-error-list" class="validation-error-list"></ul>
-                <button type="button" onclick="closeValidationBox()" class="validation-dismiss-btn">Got it</button>
-            </div>
-
             <div class="toolbar-sticky-wrapper">
                 <div class="toolbar">
                     <div class="tool-group">
@@ -116,6 +103,19 @@
                     <canvas id="drawing-canvas"></canvas>
                 </div>
             </div>
+
+            <!-- Validation Error Area (Initially Hidden) -->
+            <div id="validation-error-box" class="validation-error-box" style="display: none;">
+                <div class="validation-error-header">
+                    <span class="validation-error-icon">⚠️</span>
+                    <h3>Please Complete Required Fields</h3>
+                    <button type="button" onclick="closeValidationBox()" class="validation-close-btn">✕</button>
+                </div>
+                <p class="validation-error-intro">The following fields are required before approval:</p>
+                <ul id="validation-error-list" class="validation-error-list"></ul>
+                <button type="button" onclick="closeValidationBox()" class="validation-dismiss-btn">Got it</button>
+            </div>
+
             <div class="card mt-20">
                 <h3 class="section-title">Markings Description</h3>
                 <div class="input-stack">
