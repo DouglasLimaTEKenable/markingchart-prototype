@@ -1241,3 +1241,69 @@ textarea.validation-error:focus {
 .pdf-animal-details-container strong {
     font-weight: bold;
 }
+
+/* ======================================
+   ORIENTATION TOGGLE STYLES
+   ====================================== */
+
+.orientation-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    font-size: 14px;
+}
+
+.orientation-btn:hover {
+    transform: scale(1.05);
+}
+
+.orientation-btn.active-orientation {
+    border: 2px solid var(--primary-color) !important;
+    background: var(--primary-color) !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
+.orientation-btn:not(.active-orientation) {
+    border: 2px solid #ccc;
+    background: white;
+    color: #666;
+}
+
+/* ======================================
+   LANDSCAPE LAYOUT OVERRIDES
+   ====================================== */
+
+#pdf-preview-container[data-orientation="landscape"] {
+    width: 277mm !important;  /* A4 landscape width (was height) */
+    max-height: 190mm !important;  /* A4 landscape height (was width) */
+    min-height: auto;
+}
+
+/* Adjust PDF table layout for landscape */
+#pdf-preview-container[data-orientation="landscape"] .pdf-table {
+    font-size: 11px;  /* Slightly smaller to fit */
+}
+
+#pdf-preview-container[data-orientation="landscape"] .pdf-table th {
+    width: 12%;  /* Narrower labels in landscape */
+}
+
+/* Adjust diagram area for landscape */
+#pdf-preview-container[data-orientation="landscape"] .pdf-diagram-area {
+    max-height: 120mm;  /* Constrain height in landscape */
+}
+
+/* Adjust details column for landscape */
+#pdf-preview-container[data-orientation="landscape"] .pdf-table th[rowspan] {
+    width: 35%;  /* Narrower details column in landscape */
+    font-size: 10px;
+}
+
+/* Portrait layout (default - no changes needed but explicit for clarity) */
+#pdf-preview-container[data-orientation="portrait"] {
+    width: 190mm;
+    max-height: 277mm;
+}

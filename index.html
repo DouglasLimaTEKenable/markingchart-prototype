@@ -267,6 +267,54 @@
                 </button>
             </div>
 
+            <!-- Add this BEFORE the existing pdf-wrapper-scroller -->
+            <div class="pdf-orientation-controls" style="
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 20px;
+                padding: 16px;
+                background: white;
+                border-radius: 12px;
+                margin-bottom: 16px;
+            ">
+                <label style="font-weight: 600; color: #666;">Page Orientation:</label>
+                <div style="display: flex; gap: 12px;">
+                    <button 
+                        id="btn-portrait" 
+                        class="orientation-btn active-orientation" 
+                        onclick="setOrientation('portrait')"
+                        style="
+                            padding: 10px 20px;
+                            border: 2px solid var(--primary-color);
+                            background: var(--primary-color);
+                            color: white;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-weight: 600;
+                            transition: all 0.2s;
+                        ">
+                        📄 Portrait
+                    </button>
+                    <button 
+                        id="btn-landscape" 
+                        class="orientation-btn" 
+                        onclick="setOrientation('landscape')"
+                        style="
+                            padding: 10px 20px;
+                            border: 2px solid #ccc;
+                            background: white;
+                            color: #666;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-weight: 600;
+                            transition: all 0.2s;
+                        ">
+                        📃 Landscape
+                    </button>
+                </div>
+            </div>
+
             <div class="pdf-wrapper-scroller" id="pdf-wrapper-scroller">
                 <!-- Add zoom controls for PDF preview -->
                 <div class="pdf-zoom-controls">
@@ -276,7 +324,7 @@
                     <span class="zoom-indicator" id="pdf-zoom-level">100%</span>
                 </div>
                 
-                <div id="pdf-preview-container">
+                <div id="pdf-preview-container" data-orientation="portrait">
                     <div id="watermark">DRAFT</div>
                     <div class="pdf-section-header"><h3>VETERINARY MARKINGS CHART</h3></div>
                     
