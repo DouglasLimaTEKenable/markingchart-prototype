@@ -611,7 +611,7 @@ function renderPreview() {
     if (sex) document.getElementById('disp-sex').innerText = sex.value || '';
     
     const dob = document.getElementById('input-dob');
-    if (dob) document.getElementById('disp-dob').innerText = dob.value || '';
+    if (dob) document.getElementById('disp-dob').innerText = formatDateToDDMMYYYY(dob.value) || '';
     
     const species = document.querySelector('input[name="species"]:checked');
     if (species) document.getElementById('disp-species').innerText = species.value || 'EQUINE';
@@ -658,7 +658,7 @@ function renderPreview() {
     }
     
     const dateEl = document.getElementById('exam-date');
-    if(dateEl) document.getElementById('disp-date').innerText = dateEl.value;
+    if(dateEl) document.getElementById('disp-date').innerText = formatDateToDDMMYYYY(dateEl.value) || '';
 
     // Display vet stamp
     const vetStampInput = document.getElementById('input-vet-stamp');
@@ -681,7 +681,7 @@ function renderPreview() {
         sigImage.classList.add('active');
         if (sigDate) {
             const today = new Date().toLocaleDateString('en-GB');
-            sigDate.innerText = today;
+            sigDate.innerText = formatDateToDDMMYYYY(today) || '';
         }
     } else if (sigImage) {
         sigImage.classList.remove('active');
@@ -1261,4 +1261,19 @@ function closeValidationBox() {
     if (errorBox) {
         errorBox.style.display = 'none';
     }
+}
+
+// --- DATE FORMATTING HELPER ---
+function formatDateToDDMMYYYY(dateString) {
+    if (!dateString) return '';
+    
+    // dateString is in YYYY-MM-DD format from HTML date input
+    const parts = dateString.split('-');
+    if (parts.length !== 3) return dateString; // Return original if invalid
+    
+    const year = parts[0];
+    const month = parts[1];
+    const day = parts[2];
+    
+    return `${day}/${month}/${year}`;
 }

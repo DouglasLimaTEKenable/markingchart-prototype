@@ -1231,10 +1231,10 @@ textarea.validation-error:focus {
 }
 
 .pdf-detail-cell {
-    vertical-align: top;
-    background: #fff;
-    width: 42%;
-    padding:  12px;
+    vertical-align: top!important;
+    background: #fff!important;
+    width: 40%!important;
+    padding:  12px!important;
 }
 
 /* Make sure all strong tags in PDF preview are bold */
