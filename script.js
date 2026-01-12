@@ -41,6 +41,8 @@ function switchTab(tabId) {
         // Reset PDF zoom when entering preview
         setTimeout(() => {
             resetPDFZoom();
+            // Ensure orientation is applied when entering preview tab
+            setOrientation(pdfOrientation);  // Re-apply current orientation
         }, 100);
     }
     
@@ -710,6 +712,9 @@ function generatePDF() {
 
     // Use a timeout to ensure DOM is settled
     setTimeout(() => {
+        // Support both portrait and landscape orientations
+        const orientation = getCurrentOrientation();
+        
         // Get microchip number for filename
         const microchipInput = document.getElementById('input-microchip');
         const microchipNumber = microchipInput && microchipInput.value.trim() 
@@ -731,7 +736,7 @@ function generatePDF() {
             jsPDF: { 
                 unit: 'mm', 
                 format: 'a4',
-                orientation: 'portrait'
+                orientation: orientation  // Use dynamic orientation from state
             },
             pagebreak:  { 
                 mode: 'avoid-all'
@@ -1276,4 +1281,62 @@ function formatDateToDDMMYYYY(dateString) {
     const day = parts[2];
     
     return `${day}/${month}/${year}`;
+}
+
+// ======================================
+// ORIENTATION MANAGEMENT
+// ======================================
+
+// Global variable to track current orientation
+let pdfOrientation = 'portrait';  // Default
+
+/**
+ * Sets the PDF preview orientation and updates UI
+ * @param {string} orientation - 'portrait' or 'landscape'
+ */
+function setOrientation(orientation) {
+    // Validate input
+    if (orientation !== 'portrait' && orientation !== 'landscape') {
+        console.error('Invalid orientation:', orientation);
+        return;
+    }
+    
+    // Update global state
+    pdfOrientation = orientation;
+    
+    // Update PDF container data attribute
+    const pdfContainer = document.getElementById('pdf-preview-container');
+    if (pdfContainer) {
+        pdfContainer.setAttribute('data-orientation', orientation);
+    }
+    
+    // Update button states
+    const portraitBtn = document.getElementById('btn-portrait');
+    const landscapeBtn = document.getElementById('btn-landscape');
+    
+    if (portraitBtn && landscapeBtn) {
+        if (orientation === 'portrait') {
+            portraitBtn.classList.add('active-orientation');
+            landscapeBtn.classList.remove('active-orientation');
+        } else {
+            portraitBtn.classList.remove('active-orientation');
+            landscapeBtn.classList.add('active-orientation');
+        }
+    }
+    
+    // Re-render preview to apply new layout
+    renderPreview();
+    
+    // Reset PDF zoom to fit new orientation
+    setTimeout(() => {
+        resetPDFZoom();
+    }, 100);
+}
+
+/**
+ * Gets current PDF orientation
+ * @returns {string} 'portrait' or 'landscape'
+ */
+function getCurrentOrientation() {
+    return pdfOrientation;
 }

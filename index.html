@@ -267,6 +267,27 @@
                 </button>
             </div>
 
+            <!-- Orientation toggle controls for Portrait/Landscape PDF layout -->
+            <div class="pdf-orientation-controls">
+                <label>Page Orientation:</label>
+                <div>
+                    <button 
+                        id="btn-portrait" 
+                        class="orientation-btn active-orientation" 
+                        onclick="setOrientation('portrait')"
+                        aria-label="Set portrait orientation">
+                        📄 Portrait
+                    </button>
+                    <button 
+                        id="btn-landscape" 
+                        class="orientation-btn" 
+                        onclick="setOrientation('landscape')"
+                        aria-label="Set landscape orientation">
+                        📃 Landscape
+                    </button>
+                </div>
+            </div>
+
             <div class="pdf-wrapper-scroller" id="pdf-wrapper-scroller">
                 <!-- Add zoom controls for PDF preview -->
                 <div class="pdf-zoom-controls">
@@ -276,7 +297,7 @@
                     <span class="zoom-indicator" id="pdf-zoom-level">100%</span>
                 </div>
                 
-                <div id="pdf-preview-container">
+                <div id="pdf-preview-container" data-orientation="portrait">
                     <div id="watermark">DRAFT</div>
                     <div class="pdf-section-header"><h3>VETERINARY MARKINGS CHART</h3></div>
                     
