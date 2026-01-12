@@ -41,7 +41,7 @@ function switchTab(tabId) {
         // Reset PDF zoom when entering preview
         setTimeout(() => {
             resetPDFZoom();
-            // *** ADDED: Ensure orientation is applied ***
+            // Ensure orientation is applied when entering preview tab
             setOrientation(pdfOrientation);  // Re-apply current orientation
         }, 100);
     }
@@ -712,7 +712,7 @@ function generatePDF() {
 
     // Use a timeout to ensure DOM is settled
     setTimeout(() => {
-        // *** UPDATED: Support both portrait and landscape ***
+        // Support both portrait and landscape orientations
         const orientation = getCurrentOrientation();
         
         // Get microchip number for filename
@@ -736,7 +736,7 @@ function generatePDF() {
             jsPDF: { 
                 unit: 'mm', 
                 format: 'a4',
-                orientation: orientation  // *** CHANGED: Use dynamic orientation ***
+                orientation: orientation  // Use dynamic orientation from state
             },
             pagebreak:  { 
                 mode: 'avoid-all'
