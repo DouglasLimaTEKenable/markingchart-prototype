@@ -544,9 +544,9 @@ input[type="checkbox"] {
 }
 
 #pdf-preview-container {
-    width: 190mm; /* Reduced from 210mm to account for padding */
+    width: 277mm; /* A4 landscape width (was 190mm portrait) */
     min-height: auto;
-    max-height: 277mm; /* Reduced from 297mm to account for padding */
+    max-height: 190mm; /* A4 landscape height (was 277mm portrait) */
     background:  white;
     padding: 10mm;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
