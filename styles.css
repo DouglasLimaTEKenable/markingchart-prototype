@@ -844,6 +844,7 @@ textarea.validation-error:focus {
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 20px;
+    margin-top: 20px;
     box-shadow: 0 4px 12px rgba(255, 59, 48, 0.2);
     animation: slideDown 0.3s ease-out;
 }
