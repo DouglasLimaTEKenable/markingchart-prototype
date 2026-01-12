@@ -11,7 +11,7 @@
 
     <header class="app-header">
         <h1>Vet Markings</h1>
-        <span class="badge">v3.2</span>
+        <span class="badge">v3.3</span>
     </header>
 
     <main class="app-content">
@@ -126,7 +126,15 @@
                     <div class="form-group"><label>Hindleg L</label><textarea id="input-lh" rows="2"></textarea></div>
                     <div class="form-group"><label>Hindleg R</label><textarea id="input-rh" rows="2"></textarea></div>
                     <div class="form-group"><label>Body</label><textarea id="input-body" rows="2"></textarea></div>
-                    <div class="form-group"><label>Microchip No.</label><input type="text" id="input-microchip"></div>
+                    <div class="form-group"><label>Microchip No. (Primary) *</label><input type="text" id="input-microchip" placeholder="Primary microchip"></div>
+                    <div class="form-group">
+                        <label>Additional Microchip 1 <span style="font-size: 10px; color: #888; font-weight: normal;">(Optional)</span></label>
+                        <input type="text" id="input-microchip-2" placeholder="Enter if present" style="text-transform: uppercase;">
+                    </div>
+                    <div class="form-group">
+                        <label>Additional Microchip 2 <span style="font-size: 10px; color: #888; font-weight: normal;">(Optional)</span></label>
+                        <input type="text" id="input-microchip-3" placeholder="Enter if present" style="text-transform: uppercase;">
+                    </div>
                 </div>
 
                 <!-- New Mandatory Form Fields -->
@@ -179,8 +187,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Vet Reference No. * <span style="font-size: 10px; color: #888; font-weight: normal;">(Ireland only)</span></label>
-                    <input type="text" id="input-vet-ref" placeholder="XXX/XXX" pattern="\d{3}/\d{3}" title="Format: XXX/XXX (e.g., 123/456)">
+                    <label>Vet Reference No. * <span style="font-size: 10px; color: #888; font-weight: normal;">(e.g., 125/25 for Irish vets)</span></label>
+                    <input type="text" id="input-vet-ref" placeholder="e.g., 125/25" title="Enter your veterinary reference number">
                 </div>
 
                 <div class="form-group">
@@ -209,8 +217,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Microchip Reader Image <span style="font-size: 10px; color: #888; font-weight: normal;">(Optional - for verification)</span></label>
-                    <input type="file" id="input-microchip-image" accept="image/*" onchange="previewMicrochipImage(this)">
+                    <label>Microchip Reader Image * <span style="font-size: 10px; color: #888; font-weight: normal;">(Photo of scanner - REQUIRED from Dec 1st 2024)</span></label>
+                    <input type="file" id="input-microchip-image" accept="image/*" onchange="previewMicrochipImage(this)" required>
                     <div id="microchip-image-preview" style="margin-top: 10px; max-width: 200px; display: none;">
                         <img id="microchip-img" src="" style="width: 100%; height: auto; border: 1px solid #ccc; border-radius: 8px;">
                         <button type="button" onclick="clearMicrochipImage()" style="margin-top: 8px; padding: 6px 12px; font-size: 12px; background: #f2f2f7; border: 1px solid #ccc; border-radius: 6px; cursor: pointer; width: 100%;">Remove</button>
@@ -297,7 +305,8 @@
                                     <strong>Sex:</strong> <span class="pdf-input-display" id="disp-sex"></span><br>
                                     <strong>DOB:</strong> <span class="pdf-input-display" id="disp-dob"></span><br>
                                     <strong>Species:</strong> <span class="pdf-input-display" id="disp-species"></span><br>
-                                    <strong>Microchip:</strong> <span class="pdf-input-display" id="disp-microchip"></span><br>
+                                    <strong>Microchip (Primary):</strong> <span class="pdf-input-display" id="disp-microchip"></span><br>
+                                    <span id="disp-microchip-additional" style="font-size: 10px;"></span>
                                     <hr style="margin: 8px 0; border: none; border-top: 1px solid #ccc;">
                                     <strong style="font-size: 12px;">PARENTAGE</strong><br>
                                     <strong>Sire:</strong> Galileo<br>
