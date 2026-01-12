@@ -1246,6 +1246,27 @@ textarea.validation-error:focus {
    ORIENTATION TOGGLE STYLES
    ====================================== */
 
+.pdf-orientation-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 16px;
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+
+.pdf-orientation-controls label {
+    font-weight: 600;
+    color: #666;
+}
+
+.pdf-orientation-controls > div {
+    display: flex;
+    gap: 12px;
+}
+
 .orientation-btn {
     padding: 10px 20px;
     border-radius: 8px;
