@@ -57,7 +57,18 @@
         </div>
 
         <div id="tab-markings" class="tab-content">
-            
+            <!-- Validation Error Area (Initially Hidden) -->
+            <div id="validation-error-box" class="validation-error-box" style="display: none;">
+                <div class="validation-error-header">
+                    <span class="validation-error-icon">⚠️</span>
+                    <h3>Please Complete Required Fields</h3>
+                    <button type="button" onclick="closeValidationBox()" class="validation-close-btn">✕</button>
+                </div>
+                <p class="validation-error-intro">The following fields are required before approval:</p>
+                <ul id="validation-error-list" class="validation-error-list"></ul>
+                <button type="button" onclick="closeValidationBox()" class="validation-dismiss-btn">Got it</button>
+            </div>
+
             <div class="toolbar-sticky-wrapper">
                 <div class="toolbar">
                     <div class="tool-group">

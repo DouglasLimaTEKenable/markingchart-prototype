@@ -1126,16 +1126,22 @@ window.addEventListener('load', function() {
                     // Prevent checking
                     this.checked = false;
                     
-                    // Show error message
-                    let message = 'Please complete the following required fields:\n\n';
-                    message += missingFields.map(f => '• ' + f).join('\n');
+                    // Show inline validation error box
+                    showValidationErrors(missingFields);
                     
-                    showCustomAlert(message, 'Missing Required Fields', '⚠️');
+                    // Scroll to validation box
+                    document.getElementById('validation-error-box').scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start' 
+                    });
                     
-                    // Scroll to first error
-                    scrollToFirstError();
+                    // Also scroll to first error after a delay
+                    setTimeout(scrollToFirstError, 800);
                 } else {
-                    // All validation passed, show signature pad
+                    // All validation passed, hide any validation box
+                    closeValidationBox();
+                    
+                    // Show signature pad
                     document.getElementById('signature-section').style.display = 'block';
                     
                     // Initialize signature pad if not already done
@@ -1153,7 +1159,7 @@ window.addEventListener('load', function() {
                 // User is unchecking approval
                 if (signatureDataURL) {
                     showCustomConfirm(
-                        'Unchecking will clear your signature. Are you sure? ',
+                        'Unchecking will clear your signature. Are you sure?',
                         'Clear Signature? ',
                         '⚠️',
                         function() {
@@ -1166,7 +1172,7 @@ window.addEventListener('load', function() {
                     );
                     // If user cancels, re-check the box
                     setTimeout(() => {
-                        if (!signatureDataURL) { // User confirmed
+                        if (! signatureDataURL) { // User confirmed
                             approveCheckbox.checked = false;
                         } else {
                             approveCheckbox.checked = true;
@@ -1187,3 +1193,32 @@ window.addEventListener('load', function() {
         }
     }, true);
 });
+
+// Show validation errors in inline box
+function showValidationErrors(missingFields) {
+    const errorBox = document.getElementById('validation-error-box');
+    const errorList = document.getElementById('validation-error-list');
+    
+    if (! errorBox || !errorList) return;
+    
+    // Clear previous errors
+    errorList.innerHTML = '';
+    
+    // Add each missing field as a list item
+    missingFields.forEach(field => {
+        const li = document.createElement('li');
+        li.textContent = field;
+        errorList.appendChild(li);
+    });
+    
+    // Show the box
+    errorBox.style.display = 'block';
+}
+
+// Close validation error box
+function closeValidationBox() {
+    const errorBox = document.getElementById('validation-error-box');
+    if (errorBox) {
+        errorBox.style. display = 'none';
+    }
+}

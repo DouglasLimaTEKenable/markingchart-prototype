@@ -836,3 +836,114 @@ textarea.validation-error:focus {
     border: 2px solid var(--primary-color) !important;
     animation: none;
 }
+
+/* --- INLINE VALIDATION ERROR BOX --- */
+.validation-error-box {
+    background:  linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
+    border: 2px solid var(--danger-color);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(255, 59, 48, 0.2);
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform:  translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.validation-error-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom:  12px;
+}
+
+.validation-error-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+}
+
+.validation-error-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: var(--danger-color);
+    flex:  1;
+}
+
+.validation-close-btn {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: #999;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.validation-close-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.validation-error-intro {
+    margin:  0 0 12px 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.validation-error-list {
+    margin: 0 0 16px 0;
+    padding-left: 24px;
+    list-style:  none;
+}
+
+.validation-error-list li {
+    padding: 6px 0;
+    font-size: 14px;
+    color: var(--text-color);
+    font-weight: 500;
+    position: relative;
+}
+
+.validation-error-list li:before {
+    content: "•";
+    color: var(--danger-color);
+    font-weight: bold;
+    font-size: 18px;
+    position: absolute;
+    left: -16px;
+}
+
+.validation-dismiss-btn {
+    background: var(--danger-color);
+    color: white;
+    border:  none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition:  transform 0.1s, background 0.2s;
+}
+
+.validation-dismiss-btn:active {
+    transform: scale(0.98);
+}
+
+.validation-dismiss-btn:hover {
+    background: #e6352a;
+}
