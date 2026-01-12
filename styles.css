@@ -1277,8 +1277,8 @@ textarea.validation-error:focus {
    ====================================== */
 
 #pdf-preview-container[data-orientation="landscape"] {
-    width: 277mm !important;  /* A4 landscape width (was height) */
-    max-height: 190mm !important;  /* A4 landscape height (was width) */
+    width: 277mm !important;  /* A4 landscape: 297mm - 20mm padding */
+    max-height: 190mm !important;  /* A4 landscape: 210mm - 20mm padding */
     min-height: auto;
 }
 
