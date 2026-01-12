@@ -613,7 +613,6 @@ function renderPreview() {
     const dob = document.getElementById('input-dob');
     if (dob) document.getElementById('disp-dob').innerText = dob.value || '';
     
-    // FIX: Remove extra space in selector
     const species = document.querySelector('input[name="species"]:checked');
     if (species) document.getElementById('disp-species').innerText = species.value || 'EQUINE';
     
@@ -1034,6 +1033,7 @@ function validateMandatoryFields() {
         dob.classList.add('validation-error');
     }
     
+    // Check species
     const species = document.querySelector('input[name="species"]:checked');
     if (!species) {
         missingFields.push('Species');
@@ -1041,6 +1041,12 @@ function validateMandatoryFields() {
         const speciesGroup = document.querySelector('input[name="species"]').closest('.form-group');
         if (speciesGroup) {
             speciesGroup.classList.add('validation-error');
+        }
+    } else {
+        // Clear any previous validation error
+        const speciesGroup = document.querySelector('input[name="species"]').closest('.form-group');
+        if (speciesGroup) {
+            speciesGroup.classList.remove('validation-error');
         }
     }
     
