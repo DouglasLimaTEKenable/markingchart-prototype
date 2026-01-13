@@ -23,6 +23,11 @@ let panY = 0;
 const MIN_ZOOM = 0.2; 
 const MAX_ZOOM = 4;
 let panStart = { x:  0, y: 0 };
+let isPDFPanning = false;
+let pdfPanX = 0;
+let pdfPanY = 0;
+let pdfPanStart = { x: 0, y: 0 };
+let pdfDragStart = { x: 0, y: 0 };
 
 // For Drawing Paths
 let currentPathPoints = [];
@@ -691,6 +696,11 @@ function renderPreview() {
     const isApproved = document.getElementById('approve-chk').checked;
     document.getElementById('disp-status').innerText = isApproved ? 'APPROVED' : 'DRAFT';
     document.getElementById('watermark').style.display = isApproved ?   'none' : 'block';
+
+    // Initialize PDF pan functionality
+    setTimeout(() => {
+        initPDFPan();
+    }, 100);
 }
 
 function generatePDF() {
@@ -755,7 +765,24 @@ function generatePDF() {
     }, 100);
 }
 
-// PDF zoom functions
+function showPDFPanHint() {
+    let hint = document.getElementById('pdf-pan-hint');
+    
+    if (!hint) {
+        hint = document.createElement('div');
+        hint.id = 'pdf-pan-hint';
+        hint.className = 'pdf-pan-hint';
+        hint. textContent = '✋ Click and drag to pan';
+        document.getElementById('pdf-wrapper-scroller').appendChild(hint);
+    }
+    
+    hint.classList.add('show');
+    
+    setTimeout(() => {
+        hint.classList.remove('show');
+    }, 2000);
+}
+
 function updatePDFZoom(delta) {
     let newScale = pdfScale + delta;
     if (newScale < MIN_PDF_ZOOM) newScale = MIN_PDF_ZOOM;
@@ -763,10 +790,17 @@ function updatePDFZoom(delta) {
     
     pdfScale = newScale;
     applyPDFZoom();
+    
+    // Show pan hint when zooming in beyond 100%
+    if (pdfScale > 1) {
+        showPDFPanHint();
+    }
 }
 
 function resetPDFZoom() {
     pdfScale = 1;
+    pdfPanX = 0;
+    pdfPanY = 0;
     applyPDFZoom();
 }
 
@@ -775,12 +809,97 @@ function applyPDFZoom() {
     const zoomIndicator = document.getElementById('pdf-zoom-level');
     
     if (pdfContainer) {
-        pdfContainer.style.transform = `scale(${pdfScale})`;
+        // Update cursor based on zoom level
+        pdfContainer.style.cursor = pdfScale > 1 ? 'grab' : 'default';
     }
+    
+    applyPDFTransform();
     
     if (zoomIndicator) {
         zoomIndicator.textContent = Math.round(pdfScale * 100) + '%';
     }
+}
+
+// Add new function to apply both zoom and pan
+function applyPDFTransform() {
+    const pdfContainer = document.getElementById('pdf-preview-container');
+    
+    if (pdfContainer) {
+        pdfContainer.style.transform = `translate(${pdfPanX}px, ${pdfPanY}px) scale(${pdfScale})`;
+    }
+}
+
+function initPDFPan() {
+    const pdfScroller = document.getElementById('pdf-wrapper-scroller');
+    const pdfContainer = document.getElementById('pdf-preview-container');
+    
+    if (!pdfScroller || !pdfContainer) return;
+    
+    function startPDFPan(e) {
+        // Only enable panning if zoomed in
+        if (pdfScale <= 1) return;
+        
+        if (e.cancelable) e.preventDefault();
+        
+        let cx, cy;
+        if (e.changedTouches && e.changedTouches. length > 0) {
+            cx = e.changedTouches[0].clientX;
+            cy = e.changedTouches[0].clientY;
+        } else {
+            cx = e.clientX;
+            cy = e.clientY;
+        }
+        
+        isPDFPanning = true;
+        pdfDragStart = { x: cx, y: cy };
+        pdfPanStart = { x: pdfPanX, y: pdfPanY };
+        pdfContainer.style.cursor = 'grabbing';
+        pdfContainer.style.transition = 'none';
+    }
+    
+    function movePDFPan(e) {
+        if (!isPDFPanning) return;
+        if (e.cancelable) e.preventDefault();
+        
+        let cx, cy;
+        if (e. changedTouches && e. changedTouches.length > 0) {
+            cx = e.changedTouches[0].clientX;
+            cy = e.changedTouches[0].clientY;
+        } else {
+            cx = e.clientX;
+            cy = e.clientY;
+        }
+        
+        const dx = cx - pdfDragStart.x;
+        const dy = cy - pdfDragStart.y;
+        
+        pdfPanX = pdfPanStart.x + dx;
+        pdfPanY = pdfPanStart.y + dy;
+        
+        applyPDFTransform();
+    }
+    
+    function endPDFPan(e) {
+        if (!isPDFPanning) return;
+        if (e.cancelable) e.preventDefault();
+        
+        isPDFPanning = false;
+        pdfContainer.style. cursor = pdfScale > 1 ? 'grab' : 'default';
+        pdfContainer.style.transition = 'transform 0.2s ease-out';
+    }
+    
+    // Mouse events
+    pdfContainer.addEventListener('mousedown', startPDFPan);
+    pdfContainer.addEventListener('mousemove', movePDFPan);
+    pdfContainer.addEventListener('mouseup', endPDFPan);
+    pdfContainer.addEventListener('mouseleave', endPDFPan);
+    
+    // Touch events
+    const touchOpt = { passive: false };
+    pdfContainer.addEventListener('touchstart', startPDFPan, touchOpt);
+    pdfContainer.addEventListener('touchmove', movePDFPan, touchOpt);
+    pdfContainer.addEventListener('touchend', endPDFPan, touchOpt);
+    pdfContainer.addEventListener('touchcancel', endPDFPan, touchOpt);
 }
 
 // --- SIGNATURE CAPTURE ---

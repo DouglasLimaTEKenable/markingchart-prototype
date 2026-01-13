@@ -476,7 +476,7 @@ input[type="checkbox"] {
 
 .pdf-wrapper-scroller {
     width: 100%;
-    overflow:  auto; /* Enable scrolling for zoomed content */
+    overflow: visible; /* Changed from auto to allow panning beyond edges */
     display: flex;
     justify-content: center;
     background: #555;
@@ -484,6 +484,28 @@ input[type="checkbox"] {
     border-radius: 8px;
     position: relative;
     min-height: 500px;
+    touch-action: none; /* Prevent browser gestures */
+}
+
+/* Add hint text for pan functionality */
+.pdf-pan-hint {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding:  8px 16px;
+    border-radius:  8px;
+    font-size:  12px;
+    z-index:  40;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.pdf-pan-hint.show {
+    opacity: 1;
 }
 
 /* PDF Zoom Controls */
@@ -544,19 +566,30 @@ input[type="checkbox"] {
 }
 
 #pdf-preview-container {
-    width: 190mm; /* Reduced from 210mm to account for padding */
+    width: 190mm;
     min-height: auto;
-    max-height: 277mm; /* Reduced from 297mm to account for padding */
-    background:  white;
+    max-height: 277mm;
+    background: white;
     padding: 10mm;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
     position: relative;
-    transform-origin: top center;
+    transform-origin: center center; /* Changed from top center */
     transition: transform 0.2s ease-out;
     transform: scale(1);
-    margin: 0 auto; /* Center the container */
+    margin:  0 auto;
     overflow: hidden;
-    box-sizing: content-box; /* Changed from border-box */
+    box-sizing: content-box;
+    cursor: default; /* Default cursor */
+    user-select: none; /* Prevent text selection during pan */
+    -webkit-user-select: none;
+}
+
+#pdf-preview-container.zoomed {
+    cursor: grab;
+}
+
+#pdf-preview-container.zoomed:active {
+    cursor: grabbing;
 }
 
 /* Remove the media query that was forcing scale */
