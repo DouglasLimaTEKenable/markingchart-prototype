@@ -1279,7 +1279,7 @@ textarea.validation-error:focus {
 .canvas-ueln-label {
     position: absolute;
     bottom:  10px;
-    right: 170px;
+    right: 160px;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(8px);
     padding: 8px 12px;
