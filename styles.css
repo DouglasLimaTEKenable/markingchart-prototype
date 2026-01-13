@@ -548,7 +548,7 @@ input[type="checkbox"] {
     min-height: auto;
     max-height: 277mm; /* Reduced from 297mm to account for padding */
     background:  white;
-    padding: 10mm;
+    padding: 8mm; /* REDUCED from 10mm to save 4mm total height */
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
     position: relative;
     transform-origin: top center;
@@ -597,15 +597,24 @@ input[type="checkbox"] {
 .pdf-section-header { 
     text-align: center; 
     border-bottom: 2px solid #333; 
-    margin-bottom: 10px; 
+    margin-bottom: 6px; /* REDUCED from 10px */
+}
+
+.pdf-section-header h3 {
+    margin: 4px 0; /* ADDED: Reduce header margin */
+    font-size: 14px; /* ADDED: Slightly smaller header */
 }
 
 .pdf-diagram-area { 
     width: 100%; 
+    max-height: 85mm; /* ADDED: Constrain diagram height for landscape */
     border: 1px solid #333; 
-    margin-bottom: 10px; 
+    margin-bottom: 8px; /* REDUCED from 10px to 8px */
     background: white; 
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .pdf-diagram-wrapper { 
@@ -632,9 +641,10 @@ input[type="checkbox"] {
 
 .pdf-table th, .pdf-table td { 
     border: 1px solid #333; 
-    padding: 6px; 
+    padding: 4px; /* REDUCED from 6px to save space */
     vertical-align: top; 
-    font-size: 12px; 
+    font-size: 10px; /* REDUCED from 12px for more compact layout */
+    line-height: 1.3; /* ADDED: Tighter line spacing */
 }
 
 .pdf-table th { 
@@ -1148,19 +1158,19 @@ textarea.validation-error:focus {
 /* --- PDF PREVIEW SPECIFIC --- */
 .pdf-animal-details-container {
     font-size: 11px;
-    line-height: 1.6;
+    line-height: 1.4; /* REDUCED from 1.6 for more compact layout */
 }
 
 .pdf-section-heading {
-    font-size: 12px;
+    font-size: 10px; /* REDUCED from 12px */
     font-weight: bold;
     display: block;
-    margin-top: 4px;
+    margin-top: 2px; /* REDUCED from 4px */
     margin-bottom:  2px;
 }
 
 .pdf-divider {
-    margin: 8px 0;
+    margin: 4px 0; /* REDUCED from 8px to save space */
     border:  none;
     border-top: 1px solid #ccc;
 }
@@ -1191,9 +1201,14 @@ textarea.validation-error:focus {
     border-radius: 4px;
 }
 
+.pdf-vet-stamp-display img {
+    max-height: 40px; /* ADDED: Constrain stamp height */
+}
+
 .pdf-vet-stamp-image {
     width: 100%;
     height: auto;
+    max-height: 40px; /* ADDED: Constrain stamp height for consistency */
 }
 
 .pdf-signature-box {
@@ -1212,7 +1227,7 @@ textarea.validation-error:focus {
 
 .pdf-signature-image {
     max-width: 100%;
-    height: 50px;
+    max-height: 30px; /* ADDED: Constrain signature height */
     display: none;
     margin:  4px 0;
 }
@@ -1234,7 +1249,8 @@ textarea.validation-error:focus {
     vertical-align: top!important;
     background: #fff!important;
     width: 40%!important;
-    padding:  12px!important;
+    padding: 4px!important; /* REDUCED from 12px for more compact layout */
+    font-size: 9px; /* ADDED: Smaller font for the details column */
 }
 
 /* Make sure all strong tags in PDF preview are bold */
