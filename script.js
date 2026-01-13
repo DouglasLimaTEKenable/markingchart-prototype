@@ -313,6 +313,14 @@ function confirmAction() {
 
 // Initialize modal click handler
 window.addEventListener('load', function() {
+    const uelnInput = document.getElementById('input-ueln');
+    if (uelnInput) {
+        // Update on input change
+        uelnInput.addEventListener('input', updateCanvasUELN);
+        // Initial update
+        updateCanvasUELN();
+    }
+
     const overlay = document.getElementById('custom-alert-overlay');
     if (overlay) {
         overlay.addEventListener('click', function(e) {
@@ -1460,4 +1468,14 @@ function formatDateToDDMMYYYY(dateString) {
     const day = parts[2];
     
     return `${day}/${month}/${year}`;
+}
+
+function updateCanvasUELN() {
+    const uelnInput = document.getElementById('input-ueln');
+    const canvasUelnValue = document.getElementById('canvas-ueln-value');
+    
+    if (uelnInput && canvasUelnValue) {
+        const uelnValue = uelnInput.value.trim();
+        canvasUelnValue.textContent = uelnValue || 'N/A';
+    }
 }
