@@ -1274,3 +1274,39 @@ textarea.validation-error:focus {
 .pdf-animal-details-container strong {
     font-weight: bold;
 }
+
+/* --- CANVAS UELN LABEL --- */
+.canvas-ueln-label {
+    position: absolute;
+    bottom:  10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    font-size: 11px;
+    font-weight: 600;
+    color: #333;
+    z-index:  30;
+    pointer-events: none;
+    user-select: none;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.5px;
+}
+
+#canvas-ueln-value {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+/* Responsive adjustment for smaller screens */
+@media(max-width: 480px) {
+    .canvas-ueln-label {
+        font-size: 9px;
+        padding: 6px 10px;
+        bottom: 8px;
+        right: 8px;
+    }
+}

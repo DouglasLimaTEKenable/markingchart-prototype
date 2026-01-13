@@ -1300,6 +1300,8 @@ window.addEventListener('load', function() {
                     // All validation passed, hide any validation box
                     closeValidationBox();
                     
+                    logMarkingsJson();
+
                     // Show signature pad
                     document.getElementById('signature-section').classList.add('active');
                     
@@ -1344,7 +1346,7 @@ window.addEventListener('load', function() {
             }
         });
     }
-    
+
     // Clear validation error on focus
     document.addEventListener('focus', function(e) {
         if (e.target.classList.contains('validation-error')) {
@@ -1352,6 +1354,69 @@ window.addEventListener('load', function() {
         }
     }, true);
 });
+
+function logMarkingsJson() {
+    const markingsData = {
+        timestamp: new Date().toISOString(),
+        vetDetails: {
+            examDate: document.getElementById('exam-date')?.value || '',
+            vetReference: document.getElementById('input-vet-ref')?.value || '',
+            vetAddress:  document.getElementById('input-vet-address')?.value || '',
+            location: document.getElementById('input-location')?.value || ''
+        },
+        animalDetails:  {
+            colour: document.getElementById('input-colour')?.value || '',
+            sex: document.getElementById('input-sex')?.value || '',
+            dateOfBirth:  document.getElementById('input-dob')?.value || '',
+            species: document.querySelector('input[name="species"]:checked')?.value || 'EQUINE'
+        },
+        markings: {
+            head: document.getElementById('input-head')?.value || '',
+            neck: document.getElementById('input-neck')?.value || '',
+            forelegLeft: document. getElementById('input-lf')?.value || '',
+            forelegRight: document.getElementById('input-rf')?.value || '',
+            hindlegLeft: document.getElementById('input-lh')?.value || '',
+            hindlegRight: document. getElementById('input-rh')?.value || '',
+            body: document.getElementById('input-body')?.value || ''
+        },
+        microchips: {
+            primary: document.getElementById('input-microchip')?.value || '',
+            additional1: document.getElementById('input-microchip-2')?.value || '',
+            additional2: document.getElementById('input-microchip-3')?.value || ''
+        },
+        canvasMarkings: {
+            totalShapes: shapes.length,
+            mSymbolCount: countMSymbols(),
+            shapes: shapes.map((shape, index) => ({
+                index: index,
+                type: shape.type,
+                color: shape.color,
+                ...(shape.type === 'symbol' ? {
+                    text:  shape.text,
+                    x: Math.round(shape.x),
+                    y: Math. round(shape.y)
+                } : {
+                    pointCount: shape.points.length,
+                    points: shape.points. map(p => ({
+                        x: Math.round(p. x),
+                        y: Math.round(p.y)
+                    }))
+                })
+            }))
+        },
+        files: {
+            vetStamp: document.getElementById('input-vet-stamp')?.files?.[0]?.name || '',
+            microchipImage: document. getElementById('input-microchip-image')?.files?.[0]?.name || ''
+        },
+        approvalStatus: 'PENDING_SIGNATURE'
+    };
+
+    console.log('=== VETERINARY MARKINGS DATA ===');
+    console.log(JSON.stringify(markingsData, null, 2));
+    console.log('=== RAW SHAPES ARRAY ===');
+    console.log(shapes);
+    console.log('================================');
+}
 
 // Show validation errors in inline box
 function showValidationErrors(missingFields) {

@@ -35,9 +35,9 @@
                         <label>Dam</label>
                         <input type="text" class="readonly-field" value="Ouija Board" readonly>
                     </div>
-                    <div class="form-group" id="ueln-group" style="display: none;">
-                        <label>UELN <span class="field-hint">(Universal Equine Life Number)</span></label>
-                        <input type="text" id="input-ueln" class="readonly-field" readonly placeholder="e.g., 372414399999123" maxlength="15">
+                    <div class="form-group">
+                        <label>UELN</label>
+                        <input type="text" id="input-ueln" class="readonly-field" value="372001234567890AB" readonly>
                     </div>
                 </div>
             </div>
@@ -101,6 +101,9 @@
                 <div id="zoom-wrapper">
                     <img id="horse-image" src="" alt="Horse Outline">
                     <canvas id="drawing-canvas"></canvas>
+                    <div id="canvas-ueln-label" class="canvas-ueln-label">
+                        UELN: <span id="canvas-ueln-value">N/A</span>
+                    </div>
                 </div>
             </div>
 
